@@ -92,13 +92,13 @@ public class CorporateCraft extends JavaPlugin{
 		
 		if(!(sender instanceof Player)) {
             logger.info("only players may issue commands!!!");
-            return true;
+            return false;
         }
 		
-		if(!perms.has(sender, "coporatecraft." + cmd.getLabel()))
+		if(!perms.has(sender, "coporatecraft." + commandLabel))
 		{
 			sender.sendMessage("you do not have permission to run this command!");
-			return true;
+			return false;
 		}
 		Player player = (Player) sender;
 		
