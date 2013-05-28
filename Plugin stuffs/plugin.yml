@@ -1,0 +1,30 @@
+name: CorporateCraft
+main: me.backspace119.CorporateCraft
+version: 0.2
+description: >
+             Corporation plugin to implement companies into Bukkit
+commands:
+  h:
+    description: heals a/the player
+  heal:
+    description: Heals a/the player.
+  test-permission:
+    description: tests a permission
+  ccStart:
+    description: starts a new company with <name> and starts and account for it charges price set by server
+  ccDefaults:
+    description: saves default config of plugin to disc overwriting current configuration
+  ccReload: 
+    description: reloads configuration for plugin
+permissions:
+  corporatecraft.*:
+    description: gives access to all corporatecraft commands
+    children:
+      corporatecraft.ccStart: true
+      corporatecraft.ccReload: true
+      corporatecraft.ccDefaults: true
+      corporatecraft.test-permission: true
+  corporatecraft.test-permission:
+    description: a test permission
+    default: true
+depend: [Vault]
