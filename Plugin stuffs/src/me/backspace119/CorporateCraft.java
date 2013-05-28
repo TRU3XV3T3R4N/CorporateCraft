@@ -12,6 +12,7 @@ import net.milkbowl.vault.permission.Permission;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -25,6 +26,7 @@ public class CorporateCraft extends JavaPlugin {
 	public static Permission perms = null;
 	public static Chat chat = null;
 	public static Company company = new Company();
+	
 
 	@Override
 	public void onEnable() {
@@ -37,6 +39,7 @@ public class CorporateCraft extends JavaPlugin {
 		}
 		setupPermissions();
 		setupChat();
+		
 
 		PluginDescriptionFile pdfFile = this.getDescription();
 
@@ -131,7 +134,7 @@ public class CorporateCraft extends JavaPlugin {
 					sender.sendMessage(ChatColor.RED
 							+ "PLEASE INPUT NAME OF NEW COMPANY == /StartCompany <name_of_new_company");
 				} else {
-					startNew(args[0], player);
+					company.startNew(args[0], player, getConfig());
 				}
 			} else {
 				sender.sendMessage(ChatColor.RED
@@ -148,18 +151,6 @@ public class CorporateCraft extends JavaPlugin {
 
 	}
 
-	public boolean startNew(String name, Player player) {
-		int startUpCosts = this.getConfig().getInt("startcost");
-
-		econ.createBank(name, player.getName());
-
-		String pass = String.valueOf(startUpCosts);
-		logger.info(pass);
-		logger.info(player.getName());
-
-		econ.withdrawPlayer(player.getName(), (double) startUpCosts);
-
-		return false;
-	}
+	
 
 }

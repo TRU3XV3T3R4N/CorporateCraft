@@ -1,19 +1,19 @@
 package me.backspace119;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
 public class Company{
 	
-	public boolean startNew(String name, Player player, JavaPlugin plugin)
+	
+	public boolean startNew(String name, Player player, FileConfiguration config)
 	{
-		double startUpCosts = Double.parseDouble(plugin.getConfig().getString("startupcost"));
 		
-		
-			
-		
-		CorporateCraft.econ.createBank(name, player.getName());
+		int startUpCosts = config.getInt("startcost");
+
+		CorporateCraft.econ.createPlayerAccount(name, player.getName() + "-COMPANY");
 		
 		CorporateCraft.econ.withdrawPlayer(player.getName(), startUpCosts);
 		
