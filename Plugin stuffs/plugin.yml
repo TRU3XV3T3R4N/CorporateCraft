@@ -16,6 +16,8 @@ commands:
     description: saves default config of plugin to disc overwriting current configuration
   ccReload: 
     description: reloads configuration for plugin
+  ccAccess:
+    description: access a company bank account
 permissions:
   corporatecraft.*:
     description: gives access to all corporatecraft commands

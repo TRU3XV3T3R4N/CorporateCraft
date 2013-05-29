@@ -26,25 +26,20 @@ public class CorporateCraft extends JavaPlugin {
 	public static Permission perms = null;
 	public static Chat chat = null;
 	public static Company company = new Company();
-	
 
 	@Override
 	public void onEnable() {
 		if (!setupEconomy()) {
-			logger.info(String.format(
-					"[%s] - Disabled due to no Vault dependency found!",
-					getDescription().getName()));
+			logger.info(String.format("[%s] - Disabled due to no Vault dependency found!",getDescription().getName()));
 			getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
 		setupPermissions();
 		setupChat();
-		
 
 		PluginDescriptionFile pdfFile = this.getDescription();
 
-		this.logger.info(pdfFile.getName() + " v. " + pdfFile.getVersion()
-				+ " Enabled");
+		this.logger.info(pdfFile.getName() + " v. " + pdfFile.getVersion() + " Enabled");
 
 	}
 
@@ -61,9 +56,7 @@ public class CorporateCraft extends JavaPlugin {
 			logger.severe("VAULT NOT FOUND!");
 			return false;
 		}
-		RegisteredServiceProvider<Economy> rsp = getServer()
-				.getServicesManager().getRegistration(
-						net.milkbowl.vault.economy.Economy.class);
+		RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
 		if (rsp == null) {
 			logger.severe("REGISTERED SERVICE PROVIDER DID NOT FIND VAULT!");
 			return false;
@@ -90,8 +83,7 @@ public class CorporateCraft extends JavaPlugin {
 		return perms != null;
 	}
 
-	public boolean onCommand(CommandSender sender, Command cmd,
-			String commandLabel, String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 
 		if (!(sender instanceof Player)) {
 			logger.info("only players may issue commands!!!");
@@ -112,45 +104,76 @@ public class CorporateCraft extends JavaPlugin {
 					targetPlayer.setHealth(20);
 					targetPlayer.sendMessage(ChatColor.AQUA + "Player: "
 							+ player.getName() + " has healed you");
+					
 
 				}
-
+				return true;
 			} else {
 				sender.sendMessage(ChatColor.RED
 						+ "you do not have permission to heal");
 			}
 
-		} else if (cmd.getLabel().equals("test-permission")) {
-			
+		} else if (commandLabel.equals("test-permission")) {
+
 			if (perms.has(player, "example.plugin.awesome")) {
 				sender.sendMessage("You are awesome!");
+				return true;
 			} else {
 				sender.sendMessage("You suck!");
+				return false;
 			}
 
-		} else if (cmd.getLabel().equalsIgnoreCase("ccStart")) {
+		} else if (commandLabel.equalsIgnoreCase("ccStart")) {
 			if (perms.has(sender, "corporatecraft.ccStart")) {
 				if (args.length < 1) {
 					sender.sendMessage(ChatColor.RED
 							+ "PLEASE INPUT NAME OF NEW COMPANY == /StartCompany <name_of_new_company");
 				} else {
-					company.startNew(args[0], player, getConfig());
+					if(company.startNew(args[0], player, getConfig()))
+					{
+						logger.severe("ERROR WHILE CREATING COMPANY -- PROBABLY AN ERROR WHILE SAVING CONFIG");
+					}else{
+					logger.info(sender.getName() + " HAS STARTED COMPANY " + args[0]);
+					sender.sendMessage(ChatColor.BLUE+ "Congratulations! you have begun company "+ args[0] + " successfully type /ccAccess to access the account");
+					return true;
+				}
 				}
 			} else {
 				sender.sendMessage(ChatColor.RED
 						+ "you do not have permission to Start a Company");
 			}
-		} else if (cmd.getLabel().equals("ccDefaults")) {
+		} else if (commandLabel.equals("ccDefaults")) {
 			saveDefaultConfig();
-			String pass = getConfig().getString("startcost");
-			logger.info(pass);
-		} else if (cmd.getLabel().equals("ccReload")) {
+			return true;
+
+		} else if (commandLabel.equals("ccReload")) {
 			reloadConfig();
+			return true;
+		} else if (commandLabel.equals("ccAccess"))
+		{
+			if(perms.has(player, "corporatecraft.ccAccess"))
+			{
+				if(args.length < 1)
+				{
+					if(econ.hasAccount(player.getName() + "-COMPANY"))
+					{
+						player.sendMessage(ChatColor.GREEN + "Current company balance: " + String.valueOf(econ.getBalance(player.getName() + "-COMPANY")));
+						player.sendMessage(ChatColor.GOLD + "/ccAccess withdraw <amount>");
+						player.sendMessage(ChatColor.GOLD + "/ccAccess deposit <amount>");
+						
+						return true;
+					} else {
+						player.sendMessage(ChatColor.GOLD + "You do not own a company");
+						return false;
+					}
+				}
+			} else {
+				
+				sender.sendMessage("You do not have permission to access a company account!");
+			}
 		}
 		return false;
 
 	}
-
-	
 
 }
