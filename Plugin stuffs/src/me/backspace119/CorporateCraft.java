@@ -129,7 +129,7 @@ public class CorporateCraft extends JavaPlugin {
 					sender.sendMessage(ChatColor.RED
 							+ "PLEASE INPUT NAME OF NEW COMPANY == /StartCompany <name_of_new_company");
 				} else {
-					if(company.startNew(args[0], player, getConfig()))
+					if(company.startNew(args[0], sender, getConfig()))
 					{
 						logger.severe("ERROR WHILE CREATING COMPANY -- PROBABLY AN ERROR WHILE SAVING CONFIG");
 					}else{
@@ -149,22 +149,42 @@ public class CorporateCraft extends JavaPlugin {
 		} else if (commandLabel.equals("ccReload")) {
 			reloadConfig();
 			return true;
-		} else if (commandLabel.equals("ccAccess"))
+		} else if (commandLabel.equalsIgnoreCase("ccAccess"))
 		{
-			if(perms.has(player, "corporatecraft.ccAccess"))
+			if(perms.has(sender, "corporatecraft.ccAccess"))
 			{
 				if(args.length < 1)
 				{
-					if(econ.hasAccount(player.getName() + "-COMPANY"))
+					if(econ.hasAccount(player.getName() + "comp"))
 					{
-						player.sendMessage(ChatColor.GREEN + "Current company balance: " + String.valueOf(econ.getBalance(player.getName() + "-COMPANY")));
-						player.sendMessage(ChatColor.GOLD + "/ccAccess withdraw <amount>");
-						player.sendMessage(ChatColor.GOLD + "/ccAccess deposit <amount>");
+						sender.sendMessage(ChatColor.GREEN + "Current company balance: " + String.valueOf(econ.getBalance(player.getName() + "-COMPANY")));
+						sender.sendMessage(ChatColor.GOLD + "/ccAccess withdraw <amount>");
+						sender.sendMessage(ChatColor.GOLD + "/ccAccess deposit <amount>");
 						
 						return true;
 					} else {
-						player.sendMessage(ChatColor.GOLD + "You do not own a company");
+						sender.sendMessage(ChatColor.GOLD + "You do not own a company");
 						return false;
+					}
+				} else {
+					if(String.valueOf(args[0]).equalsIgnoreCase("withdraw"))
+					{
+						if(args.length < 2)
+						{
+							sender.sendMessage(ChatColor.RED + "Not enough Arguements /ccAccess withdraw <amount>");
+						}else{
+							econ.depositPlayer(sender.getName(),Double.parseDouble(args[1]));
+							econ.withdrawPlayer(sender.getName() + "comp", Double.parseDouble(args[1]));
+						}
+					}else if (args[0].equalsIgnoreCase("deposit"))
+					{
+						if(args.length < 2)
+						{
+							sender.sendMessage(ChatColor.RED + "Not enough Arguements /ccAccess deposit <amount>");
+						}else{
+							econ.withdrawPlayer(sender.getName(),Double.parseDouble(args[1]));
+							econ.depositPlayer(sender.getName() + "comp", Double.parseDouble(args[1]));
+						}
 					}
 				}
 			} else {
