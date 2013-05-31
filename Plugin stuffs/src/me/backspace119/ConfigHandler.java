@@ -18,13 +18,13 @@ public class ConfigHandler {
 	public void loadConfig() {
 		if (customConfigFile == null) {
 			customConfigFile = new File(CorporateCraft.plugin.getDataFolder(),
-					"customConfig.yml");
+					"companies.yml");
 		}
 		customConfig = YamlConfiguration.loadConfiguration(customConfigFile);
 
 		// Look for defaults in the jar
 		InputStream defConfigStream = CorporateCraft.plugin
-				.getResource("customConfig.yml");
+				.getResource("companies.yml");
 		if (defConfigStream != null) {
 			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
 			customConfig.setDefaults(defConfig);

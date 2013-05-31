@@ -26,17 +26,21 @@ public class CorporateCraft extends JavaPlugin {
 	public static Permission perms = null;
 	public static Chat chat = null;
 	public static Company company = new Company();
-
+	public static final ConfigHandler configHandler = new ConfigHandler();
 	@Override
 	public void onEnable() {
 		if (!setupEconomy()) {
 			logger.info(String.format("[%s] - Disabled due to no Vault dependency found!",getDescription().getName()));
 			getServer().getPluginManager().disablePlugin(this);
 			return;
+		}else if(!setupWorldGuard())
+		{
+			logger.info(String.format("[%s] - Disabled due to no WorldGuard dependency found!",getDescription().getName()));
+			getServer().getPluginManager().disablePlugin(this);
 		}
 		setupPermissions();
 		setupChat();
-
+		configHandler.loadConfig();
 		PluginDescriptionFile pdfFile = this.getDescription();
 
 		this.logger.info(pdfFile.getName() + " v. " + pdfFile.getVersion() + " Enabled");
@@ -51,11 +55,21 @@ public class CorporateCraft extends JavaPlugin {
 
 	}
 
+	private boolean setupWorldGuard()
+	{
+		if (getServer().getPluginManager().getPlugin("WorldGuard") == null) {
+			logger.severe("WORLDGUARD NOT FOUND!");
+			return false;
+		}else{
+			return true;
+		}
+	}
 	private boolean setupEconomy() {
 		if (getServer().getPluginManager().getPlugin("Vault") == null) {
 			logger.severe("VAULT NOT FOUND!");
 			return false;
 		}
+		
 		RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
 		if (rsp == null) {
 			logger.severe("REGISTERED SERVICE PROVIDER DID NOT FIND VAULT!");
@@ -83,6 +97,8 @@ public class CorporateCraft extends JavaPlugin {
 		return perms != null;
 	}
 
+	
+	
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 
 		if (!(sender instanceof Player)) {
@@ -157,7 +173,7 @@ public class CorporateCraft extends JavaPlugin {
 				{
 					if(econ.hasAccount(player.getName() + "comp"))
 					{
-						sender.sendMessage(ChatColor.GREEN + "Current company balance: " + String.valueOf(econ.getBalance(player.getName() + "-COMPANY")));
+						sender.sendMessage(ChatColor.GREEN + "Current company balance: " + String.valueOf(econ.getBalance(player.getName() + "comp")));
 						sender.sendMessage(ChatColor.GOLD + "/ccAccess withdraw <amount>");
 						sender.sendMessage(ChatColor.GOLD + "/ccAccess deposit <amount>");
 						
@@ -167,7 +183,7 @@ public class CorporateCraft extends JavaPlugin {
 						return false;
 					}
 				} else {
-					if(String.valueOf(args[0]).equalsIgnoreCase("withdraw"))
+					if(args[0].equalsIgnoreCase("withdraw"))
 					{
 						if(args.length < 2)
 						{

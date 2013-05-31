@@ -29,4 +29,4 @@ permissions:
   corporatecraft.test-permission:
     description: a test permission
     default: true
-depend: [Vault]
+depend: [Vault, WorldGuard]
