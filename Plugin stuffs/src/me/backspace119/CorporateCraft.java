@@ -1,6 +1,9 @@
 package me.backspace119;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.Vault;
@@ -13,6 +16,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -40,7 +44,7 @@ public class CorporateCraft extends JavaPlugin {
 		}
 		setupPermissions();
 		setupChat();
-		configHandler.loadConfig();
+		loadCustomConfig();
 		PluginDescriptionFile pdfFile = this.getDescription();
 
 		this.logger.info(pdfFile.getName() + " v. " + pdfFile.getVersion() + " Enabled");
@@ -211,5 +215,60 @@ public class CorporateCraft extends JavaPlugin {
 		return false;
 
 	}
+	
+	
+	
+	
+	//===========================================================================================================
+	//PAST HERE IS CONFIG STUFF FROM THE OTHER FILE I NEED TO TRY TO FIND HOW TO MAKE IT WORK THERE AND NOT HERE
+	//===========================================================================================================
+	
+	
+	
+	
+	private FileConfiguration customConfig = null;
+	private File customConfigFile = null;
+
+	public void loadCustomConfig() {
+		if (customConfigFile == null) {
+			customConfigFile = new File(getDataFolder(),"companies.yml");
+		}
+		customConfig = YamlConfiguration.loadConfiguration(customConfigFile);
+
+		// Look for defaults in the jar
+		InputStream defConfigStream = getResource("companies.yml");
+		if (defConfigStream != null) {
+			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
+			customConfig.setDefaults(defConfig);
+		}
+
+	}
+
+	public FileConfiguration getCustomConfig() {
+		if (customConfig == null) {
+			loadCustomConfig();
+		}
+		return customConfig;
+	}
+
+	public void saveCustomConfig() {
+		if (customConfig == null || customConfigFile == null) {
+			return;
+		}
+		try {
+			getCustomConfig().save(customConfigFile);
+		} catch (IOException ex) {
+			getLogger().log(Level.SEVERE,
+					"Could not save config to " + customConfigFile, ex);
+		}
+
+	}
+	
+	
+	
+	
+	
+	
+	
 
 }

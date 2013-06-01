@@ -17,8 +17,7 @@ public class ConfigHandler {
 
 	public void loadConfig() {
 		if (customConfigFile == null) {
-			customConfigFile = new File(CorporateCraft.plugin.getDataFolder(),
-					"companies.yml");
+			customConfigFile = new File(CorporateCraft.plugin.getDataFolder(),"companies.yml");
 		}
 		customConfig = YamlConfiguration.loadConfiguration(customConfigFile);
 

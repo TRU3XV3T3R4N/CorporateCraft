@@ -16,7 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Company{
 	
-	ConfigHandler configHandler = new ConfigHandler();
+	CorporateCraft configHandler = new CorporateCraft();
 	public boolean startNew(String name, CommandSender sender, FileConfiguration config)
 	{
 		
