@@ -14,7 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class ConfigHandler {
 
 	private final String fileName;
-	private FileConfiguration customConfig = null;
+	private FileConfiguration fileConfiguration = null;
 	private File configFile = null;
 	private final JavaPlugin plugin;
 	
@@ -32,42 +32,45 @@ public class ConfigHandler {
 	    }
 	
 	
-	public void loadConfig() {
-		if (configFile == null) {
-			configFile = new File(CorporateCraft.plugin.getDataFolder(),fileName);
-		}
-		customConfig = YamlConfiguration.loadConfiguration(configFile);
+	
 
-		// Look for defaults in the jar
-		InputStream defConfigStream = CorporateCraft.plugin
-				.getResource(fileName);
-		if (defConfigStream != null) {
-			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
-			customConfig.setDefaults(defConfig);
-		}
-
-	}
-
-	public FileConfiguration getCustomConfig() {
-		if (customConfig == null) {
-			loadConfig();
-		}
-		return customConfig;
-	}
-
-	public boolean saveCustomConfig() {
-		if (customConfig == null ||configFile == null) {
-			return true;
-		}
-		try {
-			getCustomConfig().save(configFile);
-		} catch (IOException ex) {
-			plugin.getLogger().log(Level.SEVERE,
-					"Could not save config to " + configFile, ex);
-			return true;
-		}
-		return false;
-
-	}
+	 public void reloadConfig() {        
+	        fileConfiguration = YamlConfiguration.loadConfiguration(configFile);
+	 
+	        // Look for defaults in the jar
+	        InputStream defConfigStream = plugin.getResource(fileName);
+	        if (defConfigStream != null) {
+	            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
+	            fileConfiguration.setDefaults(defConfig);
+	        }
+	    }
+	 
+	    public FileConfiguration getConfig() {
+	    	System.out.println("TESTSETSESTASD;LFJASD;LTKJAWE;TKJA;SDKJGA;DFKLJEKWLAJ;LSDJFL;KAWEJ;LTJASDLK;GJA;SLKRTJ;LASE");
+	    	plugin.getLogger().info("getting config");
+	        if (fileConfiguration == null) {
+	        	plugin.getLogger().info("had to reload config");
+	            this.reloadConfig();
+	        }
+	        return fileConfiguration;
+	    }
+	 
+	    public void saveConfig() {
+	        if (fileConfiguration == null || configFile == null) {
+	            return;
+	        } else {
+	            try {
+	                getConfig().save(configFile);
+	            } catch (IOException ex) {
+	                plugin.getLogger().log(Level.SEVERE, "Could not save config to " + configFile, ex);
+	            }
+	        }
+	    }
+	    
+	    public void saveDefaultConfig() {
+	        if (!configFile.exists()) {            
+	            this.plugin.saveResource(fileName, false);
+	        }
+	    }
 
 }

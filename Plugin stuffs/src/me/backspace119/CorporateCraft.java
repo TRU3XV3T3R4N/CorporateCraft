@@ -46,9 +46,7 @@ public class CorporateCraft extends JavaPlugin {
 		plugin = this;
 		setupPermissions();
 		setupChat();
-		CommandHandler executor = new CommandHandler(perms, logger, configHandler, plugin, econ);
 		
-		getCommand("cc").setExecutor(executor);
 		
 		
 		PluginDescriptionFile pdfFile = this.getDescription();
@@ -57,8 +55,10 @@ public class CorporateCraft extends JavaPlugin {
 
 
 		 configHandler = new ConfigHandler(plugin, "companies.yml");
-		 configHandler.loadConfig();
-		 
+		 configHandler.reloadConfig();
+		 CommandHandler executor = new CommandHandler(perms, logger, configHandler, plugin, econ);
+			
+		getCommand("cc").setExecutor(executor);
 		 
 	}
 

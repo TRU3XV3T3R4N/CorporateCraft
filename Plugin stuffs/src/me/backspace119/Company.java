@@ -30,15 +30,19 @@ public class Company{
 		
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 		Date date = new Date();
-		configHandler.getCustomConfig().set(name + ".founder", sender.getName());
-		configHandler.getCustomConfig().set(name + ".owner", sender.getName());
-		configHandler.getCustomConfig().set(name + ".founded", dateFormat.format(date));
-		configHandler.getCustomConfig().set(name + "managers", managers);
-		configHandler.getCustomConfig().getStringList(name + ".managers").add(sender.getName());
-		configHandler.getCustomConfig().getStringList("companies").add(name);
+		if(configHandler == null)
+		{
+			System.out.println("I KNEW IT!!!");
+		}
+		configHandler.getConfig().set(name + ".founder", sender.getName());
+		configHandler.getConfig().set(name + ".owner", sender.getName());
+		configHandler.getConfig().set(name + ".founded", dateFormat.format(date));
+		configHandler.getConfig().set(name + "managers", managers);
+		configHandler.getConfig().getStringList(name + ".managers").add(sender.getName());
+		configHandler.getConfig().getStringList("companies").add(name);
 		
-		
-		return configHandler.saveCustomConfig();
+		 configHandler.saveConfig();
+		return false;
 	}
 	
 	
