@@ -46,7 +46,11 @@ public class CommandHandler implements CommandExecutor{
 			Player player = (Player) sender;
 			
 			
-		if (args[0].equals("heal") || args[0].equals("h")) {
+		if (args.length < 1)
+		{
+			player.sendMessage(ChatColor.GOLD + "Corporate Craft v. " + plugin.getDescription().getVersion());
+		
+		}else if (args[0].equals("heal") || args[0].equals("h")) {
 			if (perms.has(sender, "corporatecraft.heal")) {
 				if (args.length == 0) {
 					player.setHealth(20);
@@ -87,8 +91,8 @@ public class CommandHandler implements CommandExecutor{
 					{
 						logger.severe("ERROR WHILE CREATING COMPANY -- PROBABLY AN ERROR WHILE SAVING CONFIG");
 					}else{
-					logger.info(sender.getName() + " HAS STARTED COMPANY " + args[0]);
-					sender.sendMessage(ChatColor.BLUE+ "Congratulations! you have begun company "+ args[0] + " successfully type /cc Access to access the account");
+					logger.info(sender.getName() + " HAS STARTED COMPANY " + args[1]);
+					sender.sendMessage(ChatColor.BLUE+ "Congratulations! you have begun company "+ args[1] + " successfully type /cc Access to access the account");
 					
 					return true;
 				}
@@ -128,8 +132,8 @@ public class CommandHandler implements CommandExecutor{
 						{
 							sender.sendMessage(ChatColor.RED + "Not enough Arguements /cc Access withdraw <amount>");
 						}else{
-							econ.depositPlayer(sender.getName(),Double.parseDouble(args[1]));
-							econ.withdrawPlayer(sender.getName() + "comp", Double.parseDouble(args[1]));
+							econ.depositPlayer(sender.getName(),Double.parseDouble(args[2]));
+							econ.withdrawPlayer(sender.getName() + "comp", Double.parseDouble(args[2]));
 						}
 					}else if (args[1].equalsIgnoreCase("deposit"))
 					{
@@ -137,8 +141,8 @@ public class CommandHandler implements CommandExecutor{
 						{
 							sender.sendMessage(ChatColor.RED + "Not enough Arguements /cc Access deposit <amount>");
 						}else{
-							econ.withdrawPlayer(sender.getName(),Double.parseDouble(args[1]));
-							econ.depositPlayer(sender.getName() + "comp", Double.parseDouble(args[1]));
+							econ.withdrawPlayer(sender.getName(),Double.parseDouble(args[2]));
+							econ.depositPlayer(sender.getName() + "comp", Double.parseDouble(args[2]));
 						}
 					}
 				}

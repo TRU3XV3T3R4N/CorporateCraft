@@ -16,8 +16,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Company{
 	
-	CorporateCraft configHandler = new CorporateCraft();
-	public boolean startNew(String name, CommandSender sender, FileConfiguration config)
+	
+	public boolean startNew(String name, CommandSender sender, FileConfiguration config, ConfigHandler configHandler)
 	{
 		
 		int startUpCosts = config.getInt("startcost");
@@ -37,8 +37,8 @@ public class Company{
 		configHandler.getCustomConfig().getStringList(name + ".managers").add(sender.getName());
 		configHandler.getCustomConfig().getStringList("companies").add(name);
 		
-		configHandler.saveCustomConfig();
-		return false;
+		
+		return configHandler.saveCustomConfig();
 	}
 	
 	

@@ -4,19 +4,21 @@ version: 0.2
 description: >
              Corporation plugin to implement companies into Bukkit
 commands:
-  h:
+  cc:
+    description: displays info on plugin
+  cc h:
     description: heals a/the player
-  heal:
+  cc heal:
     description: Heals a/the player.
-  test-permission:
+  cc test-permission:
     description: tests a permission
-  ccStart:
+  cc Start:
     description: starts a new company with <name> and starts and account for it charges price set by server
-  ccDefaults:
+  cc Defaults:
     description: saves default config of plugin to disc overwriting current configuration
-  ccReload: 
+  cc Reload: 
     description: reloads configuration for plugin
-  ccAccess:
+  cc Access:
     description: access a company bank account
 permissions:
   corporatecraft.*:
