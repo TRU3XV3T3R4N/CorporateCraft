@@ -6,5 +6,7 @@
 	<classpathentry kind="lib" path="C:/Users/Bryan/Desktop/bukkit stuffs/plugins/WorldEdit.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Bryan/Desktop/bukkit stuffs/plugins/WorldGuard.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Bryan/Desktop/bukkit stuffs/craftbukkit-1.5.2-R0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Bryan/Desktop/bukkit stuffs/plugins/WGRegionEvents.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Bryan/Desktop/bukkit stuffs/plugins/WGCustomFlags.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

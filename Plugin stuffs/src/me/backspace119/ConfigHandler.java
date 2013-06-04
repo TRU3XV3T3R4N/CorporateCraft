@@ -46,8 +46,8 @@ public class ConfigHandler {
 	    }
 	 
 	    public FileConfiguration getConfig() {
-	    	System.out.println("TESTSETSESTASD;LFJASD;LTKJAWE;TKJA;SDKJGA;DFKLJEKWLAJ;LSDJFL;KAWEJ;LTJASDLK;GJA;SLKRTJ;LASE");
-	    	plugin.getLogger().info("getting config");
+	    	
+	    	
 	        if (fileConfiguration == null) {
 	        	plugin.getLogger().info("had to reload config");
 	            this.reloadConfig();

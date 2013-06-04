@@ -1,23 +1,10 @@
 package me.backspace119;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import net.milkbowl.vault.Vault;
-import net.milkbowl.vault.VaultEco.VaultBankAccount;
+import java.util.logging.Logger;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
-
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -57,6 +44,7 @@ public class CorporateCraft extends JavaPlugin {
 		 configHandler = new ConfigHandler(plugin, "companies.yml");
 		 configHandler.reloadConfig();
 		 CommandHandler executor = new CommandHandler(perms, logger, configHandler, plugin, econ);
+		 getServer().getPluginManager().registerEvents(new RegionEventListener(configHandler, this, logger), this);
 			
 		getCommand("cc").setExecutor(executor);
 		 
@@ -115,7 +103,6 @@ public class CorporateCraft extends JavaPlugin {
 	}
 	
 	
-
 	
 	
 	

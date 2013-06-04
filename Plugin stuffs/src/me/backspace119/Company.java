@@ -28,22 +28,44 @@ public class Company{
 		
 		CorporateCraft.econ.withdrawPlayer(sender.getName(), startUpCosts);
 		
+		CorporateCraft.econ.withdrawPlayer(sender.getName() + "comp", CorporateCraft.econ.getBalance(sender.getName() + "comp"));
+		
+		CorporateCraft.econ.depositPlayer(sender.getName() + "comp", 100);
+		
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 		Date date = new Date();
-		if(configHandler == null)
-		{
-			System.out.println("I KNEW IT!!!");
-		}
+		
 		configHandler.getConfig().set(name + ".founder", sender.getName());
 		configHandler.getConfig().set(name + ".owner", sender.getName());
 		configHandler.getConfig().set(name + ".founded", dateFormat.format(date));
-		configHandler.getConfig().set(name + "managers", managers);
+		configHandler.getConfig().set(name + ".managers", managers);
 		configHandler.getConfig().getStringList(name + ".managers").add(sender.getName());
 		configHandler.getConfig().getStringList("companies").add(name);
+		configHandler.getConfig().set(name + ".stockValue", -1.00);
+		configHandler.getConfig().set(name + ".stockShares", -1.00);
+		configHandler.getConfig().set(sender.getName(), name);
 		
 		 configHandler.saveConfig();
 		return false;
 	}
+	
+	
+	public double getValue(String companyName, ConfigHandler configHandler)
+	{
+		return CorporateCraft.econ.getBalance(configHandler.getConfig().get(companyName + ".owner") + "comp");
+	}
+	
+	public double getStockValue(String companyName, ConfigHandler configHandler)
+	{
+		return configHandler.getConfig().getDouble(companyName + ".stockValue");
+	}
+	
+	public void setStockValue(String companyName, ConfigHandler configHandler, double value)
+	{
+		configHandler.getConfig().set(companyName + ".stockValue", value);
+	}
+	
+	
 	
 	
 }
