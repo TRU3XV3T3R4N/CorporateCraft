@@ -9,7 +9,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class CorporateCraft extends JavaPlugin {
 
@@ -42,13 +41,14 @@ public class CorporateCraft extends JavaPlugin {
 
 		this.logger.info(pdfFile.getName() + " v. " + pdfFile.getVersion() + " Enabled");
 
-
+		//register config
 		 configHandler = new ConfigHandler(plugin, "companies.yml");
 		 configHandler.reloadConfig();
 		 CommandHandler executor = new CommandHandler(perms, logger, configHandler, plugin, econ);
-		 getServer().getPluginManager().registerEvents(new RegionEventListener(configHandler, this, logger), this);
-		 getServer().getPluginManager().registerEvents(new PlayerEventHandler(this), this);
-			
+		 //register event listeners
+		 getServer().getPluginManager().registerEvents(new RegionEventListener(configHandler, this, logger, perms), this);
+		 getServer().getPluginManager().registerEvents(new PlayerEventHandler(this, perms), this);
+		//regsiter command listeners	
 		getCommand("cc").setExecutor(executor);
 		 
 	}

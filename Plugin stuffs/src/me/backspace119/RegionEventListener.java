@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import net.milkbowl.vault.permission.Permission;
+
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,15 +24,16 @@ public class RegionEventListener implements Listener{
 	JavaPlugin plugin;
 	Logger logger;
 	ConfigHandler tmpHandler;
-	Map<String, ItemStack[]> enterInvMap = new HashMap<String, ItemStack[]>();
+	Permission perms;
 	PlayerInventoryManagement invConfig = new PlayerInventoryManagement();
 	
 	Map<String, ItemStack> exitInvMap = new HashMap<String, ItemStack>();
-	public RegionEventListener(ConfigHandler configHandler, JavaPlugin plugin, Logger logger)
+	public RegionEventListener(ConfigHandler configHandler, JavaPlugin plugin, Logger logger, Permission perms)
 	{
 		this.configHandler = configHandler;
 		this.plugin = plugin;
 		this.logger = logger;
+		this.perms = perms;
 		tmpHandler = new ConfigHandler(plugin, "playerInv.tmp");
 		Utils.playerInCompanyPlot = tmpHandler.getConfig().getStringList("playersInPlots");
 	}
@@ -43,6 +47,8 @@ System.out.println("made it into enter region event");
 		//checks if region is associated with CorporateCraft
 		if(configHandler.getConfig().getList("companyLand").contains(e.getRegion().getId()))
 		{
+			if(!perms.has(e.getPlayer(), "corporatecraft.override.regions"))
+			{
 			//checks if theyre a member of the region (meaning a member of the company)
 		if(e.getRegion().isMember(e.getPlayer().getName()))
 		{
@@ -82,6 +88,7 @@ System.out.println("made it into enter region event");
 			logger.info(e.getPlayer().getName() + " tried to enter company owned region" + e.getRegion().getId());
 			
 		}
+			}
 		}
 	}
 	
@@ -91,18 +98,22 @@ System.out.println("made it into enter region event");
 		//checks to make sure region is associated with CorporateCraft
 		if(configHandler.getConfig().getList("companyLand").contains(e.getRegion().getId()))
 		{
+			
 			Utils.playerInCompanyPlot.remove(e.getPlayer().getName());
+			if(!perms.has(e.getPlayer(), "corporatecraft.override.regions"))
+			{
 			if(!e.getRegion().isOwner(e.getPlayer().getName()))
 			{
 				tmpHandler.getConfig().set(e.getPlayer().getName(), true);
 				
-				
+				tmpHandler.saveConfig();
 				
 				
 				 
 				
 				invConfig.restoreInv(e.getPlayer());
 				
+			}
 			}
 		}
 	}

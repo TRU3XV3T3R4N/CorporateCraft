@@ -1,6 +1,6 @@
 name: CorporateCraft
 main: me.backspace119.CorporateCraft
-version: 0.2.2
+version: 0.2.3
 description: >
              Corporation plugin to implement companies into Bukkit
 commands:
@@ -28,7 +28,14 @@ permissions:
       corporatecraft.ccReload: true
       corporatecraft.ccDefaults: true
       corporatecraft.test-permission: true
+      corporatecraft.override.*: true
+      corporatecraft.override.regions: true
   corporatecraft.test-permission:
     description: a test permission
     default: true
+  corporatecraft.override.*:
+    description: gives access to all overriding commands and events HANDLE WITH CARE!
+    default: false
+    children: 
+      corporatecraft.override.regions: true
 depend: [Vault, WorldGuard]

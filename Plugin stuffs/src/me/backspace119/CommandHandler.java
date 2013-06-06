@@ -48,57 +48,57 @@ public class CommandHandler implements CommandExecutor{
 			
 		if (args.length < 1)
 		{
-			player.sendMessage(ChatColor.GOLD + "Corporate Craft v. " + plugin.getDescription().getVersion());
+			player.sendMessage(indifferentColor() + "Corporate Craft v. " + plugin.getDescription().getVersion());
 		
 		}else if (args[0].equals("heal") || args[0].equals("h")) {
 			if (perms.has(sender, "corporatecraft.heal")) {
 				if (args.length == 0) {
 					player.setHealth(20);
-					player.sendMessage(ChatColor.AQUA + "YOU HAVE BEEN HEALED");
+					player.sendMessage(noErrorColor() + "YOU HAVE BEEN HEALED");
 
 				} else if (args.length == 1) {
 
 					Player targetPlayer = player.getServer().getPlayer(args[0]);
 					targetPlayer.setHealth(20);
-					targetPlayer.sendMessage(ChatColor.AQUA + "Player: "
+					targetPlayer.sendMessage(noErrorColor() + "Player: "
 							+ player.getName() + " has healed you");
 					
 
 				}
 				return true;
 			} else {
-				sender.sendMessage(ChatColor.RED
+				sender.sendMessage(severeErrorColor()
 						+ "you do not have permission to heal");
 			}
 
 		} else if (args[0].equals("test-permission")) {
 
 			if (perms.has(player, "example.plugin.awesome")) {
-				sender.sendMessage("You are awesome!");
+				sender.sendMessage(noErrorColor() + "You are awesome!");
 				return true;
 			} else {
-				sender.sendMessage("You suck!");
+				sender.sendMessage(severeErrorColor() + "You suck!");
 				return false;
 			}
 
 		} else if (args[0].equalsIgnoreCase("Start")) {
 			if (perms.has(sender, "corporatecraft.ccStart")) {
-				if (args.length < 1) {
-					sender.sendMessage(ChatColor.RED
-							+ "PLEASE INPUT NAME OF NEW COMPANY == /StartCompany <name_of_new_company");
+				if (args.length < 2) {
+					sender.sendMessage(severeErrorColor()
+							+ "PLEASE INPUT NAME OF NEW COMPANY == /cc Start <name_of_new_company");
 				} else {
-					if(company.startNew(args[0], sender, plugin.getConfig(), configHandler))
+					if(company.startNew(args[1], sender, plugin.getConfig(), configHandler))
 					{
-						logger.severe("ERROR WHILE CREATING COMPANY -- PROBABLY AN ERROR WHILE SAVING CONFIG");
+						logger.severe(severeErrorColor() + "ERROR WHILE CREATING COMPANY -- PROBABLY AN ERROR WHILE SAVING CONFIG");
 					}else{
 					logger.info(sender.getName() + " HAS STARTED COMPANY " + args[1]);
-					sender.sendMessage(ChatColor.BLUE+ "Congratulations! you have begun company "+ args[1] + " successfully type /cc Access to access the account");
+					sender.sendMessage(congratulationsColor() + "Congratulations! you have begun company "+ args[1] + " successfully type /cc Access to access the account");
 					
 					return true;
 				}
 				}
 			} else {
-				sender.sendMessage(ChatColor.RED
+				sender.sendMessage(severeErrorColor()
 						+ "you do not have permission to Start a Company");
 			}
 		} else if (args[0].equals("Defaults")) {
@@ -116,13 +116,13 @@ public class CommandHandler implements CommandExecutor{
 				{
 					if(econ.hasAccount(player.getName() + "comp"))
 					{
-						sender.sendMessage(ChatColor.GREEN + "Current company balance: " + String.valueOf(econ.getBalance(player.getName() + "comp")));
-						sender.sendMessage(ChatColor.GOLD + "/cc Access withdraw <amount>");
-						sender.sendMessage(ChatColor.GOLD + "/cc Access deposit <amount>");
+						sender.sendMessage(noErrorColor() + "Current company balance: " + String.valueOf(econ.getBalance(player.getName() + "comp")));
+						sender.sendMessage(indifferentColor() + "/cc Access withdraw <amount>");
+						sender.sendMessage(indifferentColor() + "/cc Access deposit <amount>");
 						
 						return true;
 					} else {
-						sender.sendMessage(ChatColor.GOLD + "You do not own a company");
+						sender.sendMessage(severeErrorColor() + "You do not own a company");
 						return false;
 					}
 				} else {
@@ -130,7 +130,7 @@ public class CommandHandler implements CommandExecutor{
 					{
 						if(args.length < 3)
 						{
-							sender.sendMessage(ChatColor.RED + "Not enough Arguements /cc Access withdraw <amount>");
+							sender.sendMessage(syntaxErrorColor() + "Not enough Arguements /cc Access withdraw <amount>");
 						}else{
 							econ.depositPlayer(sender.getName(),Double.parseDouble(args[2]));
 							econ.withdrawPlayer(sender.getName() + "comp", Double.parseDouble(args[2]));
@@ -139,7 +139,7 @@ public class CommandHandler implements CommandExecutor{
 					{
 						if(args.length < 3)
 						{
-							sender.sendMessage(ChatColor.RED + "Not enough Arguements /cc Access deposit <amount>");
+							sender.sendMessage(syntaxErrorColor() + "Not enough Arguements /cc Access deposit <amount>");
 						}else{
 							econ.withdrawPlayer(sender.getName(),Double.parseDouble(args[2]));
 							econ.depositPlayer(sender.getName() + "comp", Double.parseDouble(args[2]));
@@ -150,13 +150,53 @@ public class CommandHandler implements CommandExecutor{
 				
 				sender.sendMessage("You do not have permission to access a company account!");
 			}
+		}else if(args[0].equalsIgnoreCase("SetHiring"))
+		{
+			if(args.length < 2)
+			{
+				player.sendMessage(syntaxErrorColor() + "Please put yes or no after SetHiring -- /cc SetHiring <yes|no>");
+			}else{
+				if(args[1].equalsIgnoreCase("on"))
+				{
+					//configHandler.getConfig().con
+				}
+			}
 		}
 		}
+		
+		
+		
+		
+		
+		
 		return false;
 
 	
 	}
+	
+	
+	
+	public ChatColor syntaxErrorColor()
+	{
+		return ChatColor.GOLD;
+	}
 			
-		
+	public ChatColor congratulationsColor()
+	{
+		return ChatColor.BLUE;
+	}
+	public ChatColor noErrorColor()
+	{
+		return ChatColor.GREEN;
+	}
+	public ChatColor indifferentColor()
+	{
+		return ChatColor.GRAY;
+	}
+	public ChatColor severeErrorColor()
+	{
+		return ChatColor.RED;
+	}
+	
 	
 }
