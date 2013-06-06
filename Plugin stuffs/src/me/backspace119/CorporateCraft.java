@@ -9,6 +9,8 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+
 public class CorporateCraft extends JavaPlugin {
 
 	public final Logger logger = Logger.getLogger("Minecraft");
@@ -45,6 +47,7 @@ public class CorporateCraft extends JavaPlugin {
 		 configHandler.reloadConfig();
 		 CommandHandler executor = new CommandHandler(perms, logger, configHandler, plugin, econ);
 		 getServer().getPluginManager().registerEvents(new RegionEventListener(configHandler, this, logger), this);
+		 getServer().getPluginManager().registerEvents(new PlayerEventHandler(this), this);
 			
 		getCommand("cc").setExecutor(executor);
 		 
@@ -53,6 +56,7 @@ public class CorporateCraft extends JavaPlugin {
 	@Override
 	public void onDisable() {
 
+		
 		PluginDescriptionFile pdfFile = this.getDescription();
 		this.logger.info(pdfFile.getName() + " DISABLED");
 

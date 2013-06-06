@@ -1,45 +1,77 @@
 package me.backspace119;
 
-import java.util.logging.Logger;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mewin.WGRegionEvents.events.RegionEnterEvent;
+import com.mewin.WGRegionEvents.events.RegionLeaveEvent;
 
 public class RegionEventListener implements Listener{
 
 	ConfigHandler configHandler;
 	JavaPlugin plugin;
 	Logger logger;
+	ConfigHandler tmpHandler;
+	Map<String, ItemStack[]> enterInvMap = new HashMap<String, ItemStack[]>();
+	PlayerInventoryManagement invConfig = new PlayerInventoryManagement();
+	
+	Map<String, ItemStack> exitInvMap = new HashMap<String, ItemStack>();
 	public RegionEventListener(ConfigHandler configHandler, JavaPlugin plugin, Logger logger)
 	{
 		this.configHandler = configHandler;
 		this.plugin = plugin;
 		this.logger = logger;
+		tmpHandler = new ConfigHandler(plugin, "playerInv.tmp");
+		Utils.playerInCompanyPlot = tmpHandler.getConfig().getStringList("playersInPlots");
 	}
 	
 	@EventHandler
-	public void onRegionEnter(RegionEnterEvent e)
+	public void onRegionEnter(RegionEnterEvent e) throws IOException
 	{
 		
 System.out.println("made it into enter region event");
 		
-		if(configHandler.getConfig().getList("companyLand").contains(e.getRegion().getId()));
+		//checks if region is associated with CorporateCraft
+		if(configHandler.getConfig().getList("companyLand").contains(e.getRegion().getId()))
 		{
+			//checks if theyre a member of the region (meaning a member of the company)
 		if(e.getRegion().isMember(e.getPlayer().getName()))
 		{
+			
+			
 			//later we will use the below to add members from the companies.yml to regions as members
 			//this is just to remind me (backspace119) about the existance of this method and how to use it
 			//RegionDBUtil.addToDomain(e.getRegion().getMembers(),(String[]) configHandler.getConfig().getList("").toArray(), 0);
+			
+			//if their the owner they dont need their inventory cleared
 			if(!e.getRegion().isOwner(e.getPlayer().getName()))
 			{
-				ItemStack[] stack = new ItemStack[e.getPlayer().getInventory().getSize()];
-				stack = e.getPlayer().getInventory().getContents();
-				configHandler.getConfig().set(e.getPlayer().getName() + "Inventory", stack);
+				Utils.playerInCompanyPlot.add(e.getPlayer().getName());
+				
+				
+				System.out.println(tmpHandler.getConfig().getBoolean(e.getPlayer().getName()));
+				if(tmpHandler.getConfig().getBoolean(e.getPlayer().getName()))
+				{
+				
+				
+				tmpHandler.getConfig().getStringList("playersInPlots").add(e.getPlayer().getName());
+				tmpHandler.getConfig().set(e.getPlayer().getName(), false);
+				invConfig.storeInv(e.getPlayer());
+				tmpHandler.saveConfig();
 				e.getPlayer().getInventory().clear();
+				
+				}
+					
+				
 			}else{
 				e.getPlayer().sendMessage("Welcome to your Company's region");
 			}
@@ -50,6 +82,28 @@ System.out.println("made it into enter region event");
 			logger.info(e.getPlayer().getName() + " tried to enter company owned region" + e.getRegion().getId());
 			
 		}
+		}
+	}
+	
+	@EventHandler
+	public void onRegionLeave(RegionLeaveEvent e) throws FileNotFoundException, IOException, InvalidConfigurationException
+	{
+		//checks to make sure region is associated with CorporateCraft
+		if(configHandler.getConfig().getList("companyLand").contains(e.getRegion().getId()))
+		{
+			Utils.playerInCompanyPlot.remove(e.getPlayer().getName());
+			if(!e.getRegion().isOwner(e.getPlayer().getName()))
+			{
+				tmpHandler.getConfig().set(e.getPlayer().getName(), true);
+				
+				
+				
+				
+				 
+				
+				invConfig.restoreInv(e.getPlayer());
+				
+			}
 		}
 	}
 	
