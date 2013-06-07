@@ -1,5 +1,6 @@
 package me.backspace119;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.economy.Economy;
@@ -18,7 +19,7 @@ public class CommandHandler implements CommandExecutor{
 	private Logger logger;
 	private Economy econ;
 	private ConfigHandler configHandler;
-	private static Company company = new Company();
+	private static Company company;
 	private JavaPlugin plugin;
 	public CommandHandler(Permission perms, Logger logger, ConfigHandler configHandler, JavaPlugin plugin, Economy econ)
 	{
@@ -27,6 +28,7 @@ public class CommandHandler implements CommandExecutor{
 		this.configHandler = configHandler;
 		this.plugin = plugin;
 		this.econ = econ;
+		company = new Company(configHandler);
 	}
 
 	
@@ -87,7 +89,7 @@ public class CommandHandler implements CommandExecutor{
 					sender.sendMessage(severeErrorColor()
 							+ "PLEASE INPUT NAME OF NEW COMPANY == /cc Start <name_of_new_company");
 				} else {
-					if(company.startNew(args[1], sender, plugin.getConfig(), configHandler))
+					if(company.startNew(args[1], sender, plugin.getConfig()))
 					{
 						logger.severe(severeErrorColor() + "ERROR WHILE CREATING COMPANY -- PROBABLY AN ERROR WHILE SAVING CONFIG");
 					}else{
@@ -98,14 +100,16 @@ public class CommandHandler implements CommandExecutor{
 				}
 				}
 			} else {
-				sender.sendMessage(severeErrorColor()
-						+ "you do not have permission to Start a Company");
+				sender.sendMessage(severeErrorColor() + "you do not have permission to Start a Company");
 			}
 		} else if (args[0].equals("Defaults")) {
 			plugin.saveDefaultConfig();
 			return true;
 
-		} else if (args[0].equals("Reload")) {
+		}else if(args[0].equalsIgnoreCase("Reset"))
+		{
+			configHandler.saveDefaultConfig();
+		}else if (args[0].equals("Reload")) {
 			plugin.reloadConfig();
 			return true;
 		} else if (args[0].equalsIgnoreCase("Access"))
@@ -156,18 +160,77 @@ public class CommandHandler implements CommandExecutor{
 			{
 				player.sendMessage(syntaxErrorColor() + "Please put yes or no after SetHiring -- /cc SetHiring <yes|no>");
 			}else{
-				if(args[1].equalsIgnoreCase("on"))
+				if(args[1].equalsIgnoreCase("yes"))
 				{
-					//configHandler.getConfig().con
+					List<String> pass = configHandler.getConfig().getStringList(player.getName());
+					if(pass.size() < 1)
+					{
+						player.sendMessage(severeErrorColor() + "You do not have permission to do this in any company");
+						
+					}else if(pass.size() < 2)
+					{
+						configHandler.getConfig().set("companies." + pass.get(0) + ".hiring", true);
+						configHandler.getConfig().getStringList("companies.hiring").addAll(pass);
+						configHandler.saveConfig();
+					}else{
+						if(args.length < 3)
+						{
+						player.sendMessage(syntaxErrorColor() + "you have permission to do this in multiple companies. Please specify a company == /cc SetHiring <yes|no> <name_of_company>");
+						}else{
+							configHandler.getConfig().set("companies." + args[2] + ".hiring", true);
+							configHandler.getConfig().getStringList("hiring").add(args[2]);
+							List<String> pass2 = configHandler.getConfig().getStringList("hiring");
+							
+							configHandler.saveConfig();
+						}
+						
+					}
+					
+				}else if(args[1].equalsIgnoreCase("no"))
+				{
+					List<String> pass = configHandler.getConfig().getStringList(player.getName());
+					if(pass.size() < 1)
+					{
+						player.sendMessage(severeErrorColor() + "You do not have permission to do this in any company");
+						
+					}else if(pass.size() < 2)
+					{
+						configHandler.getConfig().set("companies." + pass.get(0) + ".hiring", false);
+						configHandler.getConfig().getStringList("companies.hiring").removeAll(pass);
+						configHandler.saveConfig();
+					}else{
+						if(args.length < 3)
+						{
+						player.sendMessage(syntaxErrorColor() + "you have permission to do this in multiple companies. Please specify a company == /cc SetHiring <yes|no> <name_of_company>");
+						}else{
+							configHandler.getConfig().set("companies." + args[2] + ".hiring", false);
+							
+							List<String> pass1 = configHandler.getConfig().getStringList("hiring");
+							pass1.remove(args[2]);
+							configHandler.getConfig().set("hiring", pass1);
+							configHandler.saveConfig();
+						}
+						
+					}
 				}
 			}
+		}else if(args[0].equalsIgnoreCase("Apply"))
+		{
+			if(args.length < 2)
+			{
+				player.sendMessage(syntaxErrorColor() + "/cc Apply <companyName> <position>");
+			}
+		}else if(args[0].equalsIgnoreCase("hiring"))
+		{
+			player.sendMessage(noErrorColor() + "Companies currently hiring:");
+			List<String> pass = configHandler.getConfig().getStringList("hiring");
+			for (String company : pass) {
+			    player.sendMessage(company);
+			}
+			
 		}
+			
 		}
-		
-		
-		
-		
-		
 		
 		return false;
 

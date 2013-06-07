@@ -14,8 +14,14 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 public class Company{
 	
+	ConfigHandler configHandler;
 	
-	public boolean startNew(String name, CommandSender sender, FileConfiguration config, ConfigHandler configHandler)
+	public Company(ConfigHandler configHandler)
+	{
+		this.configHandler = configHandler;
+	}
+	
+	public boolean startNew(String name, CommandSender sender, FileConfiguration config)
 	{
 		
 		int startUpCosts = config.getInt("startcost");
@@ -41,13 +47,18 @@ public class Company{
 		configHandler.getConfig().set("companies" + "." + name + ".owner", sender.getName());
 		configHandler.getConfig().set("companies" + "." + name + ".founded", dateFormat.format(date));
 		configHandler.getConfig().set("companies" + "." + name + ".managers", managers);
-		
-		
+		configHandler.getConfig().set("companies" + "." + name + ".hiring", false);
 		
 		configHandler.getConfig().set("companies" + "." + name + ".stockValue", -1.00);
 		configHandler.getConfig().set("companies" + "." + name + ".stockShares", -1.00);
-		configHandler.getConfig().set(sender.getName(), name);
-		configHandler.getConfig().set(sender.getName() + "." + name, "owner");
+		if(configHandler.getConfig().contains(sender.getName()))
+		{
+		configHandler.getConfig().getStringList(sender.getName()).add(name);
+		}else{
+			List<String> list = Arrays.asList(name);
+			configHandler.getConfig().set(sender.getName(), list);
+		}
+		
 		
 		 configHandler.saveConfig();
 		
@@ -56,21 +67,21 @@ public class Company{
 	}
 	
 	
-	public double getValue(String companyName, ConfigHandler configHandler)
+	public double getValue(String companyName)
 	{
 		return CorporateCraft.econ.getBalance(configHandler.getConfig().get(companyName + ".owner") + "comp");
 	}
 	
-	public double getStockValue(String companyName, ConfigHandler configHandler)
+	public double getStockValue(String companyName)
 	{
 		return configHandler.getConfig().getDouble(companyName + ".stockValue");
 	}
 	
-	public void setStockValue(String companyName, ConfigHandler configHandler, double value)
+	public void setStockValue(String companyName, double value)
 	{
 		configHandler.getConfig().set(companyName + ".stockValue", value);
 	}
-	public void disbandCompany(String companyName, ConfigHandler configHandler)
+	public void disbandCompany(String companyName)
 	{
 		//will have to run economy entirely through corporatecraft in order to delete
 		//the account correctly

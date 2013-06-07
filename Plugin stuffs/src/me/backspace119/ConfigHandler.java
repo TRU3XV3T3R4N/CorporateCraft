@@ -33,13 +33,16 @@ public class ConfigHandler {
 
 	 public void reloadConfig() {        
 	        fileConfiguration = YamlConfiguration.loadConfiguration(configFile);
-	 
+	        
+	        
 	        // Look for defaults in the jar
 	        InputStream defConfigStream = plugin.getResource(fileName);
 	        if (defConfigStream != null) {
 	            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
 	            fileConfiguration.setDefaults(defConfig);
+	            
 	        }
+	        
 	    }
 	 
 	    public FileConfiguration getConfig() {
@@ -65,9 +68,10 @@ public class ConfigHandler {
 	    }
 	    
 	    public void saveDefaultConfig() {
-	        if (!configFile.exists()) {            
-	            this.plugin.saveResource(fileName, false);
-	        }
+	                  
+	            plugin.saveResource(fileName, true);
+	            
+	        
 	    }
 
 }

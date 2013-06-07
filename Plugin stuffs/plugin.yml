@@ -20,6 +20,12 @@ commands:
     description: reloads configuration for plugin
   cc Access:
     description: access a company bank account
+  cc SetHiring:
+    description: set whether a company is hiring
+  cc Hiring:
+    description: see which companies are hiring
+  cc Reset:
+    description: resets companies.yml data HANDLE WITH CARE!
 permissions:
   corporatecraft.*:
     description: gives access to all corporatecraft commands

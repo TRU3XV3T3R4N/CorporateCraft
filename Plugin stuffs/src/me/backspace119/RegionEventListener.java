@@ -3,16 +3,11 @@ package me.backspace119;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
-
 import net.milkbowl.vault.permission.Permission;
-
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mewin.WGRegionEvents.events.RegionEnterEvent;
@@ -27,14 +22,14 @@ public class RegionEventListener implements Listener{
 	Permission perms;
 	PlayerInventoryManagement invConfig = new PlayerInventoryManagement();
 	
-	Map<String, ItemStack> exitInvMap = new HashMap<String, ItemStack>();
+	
 	public RegionEventListener(ConfigHandler configHandler, JavaPlugin plugin, Logger logger, Permission perms)
 	{
 		this.configHandler = configHandler;
 		this.plugin = plugin;
 		this.logger = logger;
 		this.perms = perms;
-		tmpHandler = new ConfigHandler(plugin, "playerInv.tmp");
+		tmpHandler = new ConfigHandler(plugin, "player.tmp");
 		Utils.playerInCompanyPlot = tmpHandler.getConfig().getStringList("playersInPlots");
 	}
 	

@@ -17,7 +17,6 @@ public class CorporateCraft extends JavaPlugin {
 	public static Economy econ = null;
 	public static Permission perms = null;
 	public static Chat chat = null;
-	public static Company company = new Company();
 	public static ConfigHandler configHandler;
 	
 	@Override
@@ -44,12 +43,21 @@ public class CorporateCraft extends JavaPlugin {
 		//register config
 		 configHandler = new ConfigHandler(plugin, "companies.yml");
 		 configHandler.reloadConfig();
+		 if(!configHandler.getConfig().getString("goodFile").equalsIgnoreCase("true"))
+		 {
+			 System.out.println(configHandler.getConfig().getString("goodFile"));
+			 configHandler.saveDefaultConfig();
+			 configHandler.reloadConfig();
+		 }
+		 
 		 CommandHandler executor = new CommandHandler(perms, logger, configHandler, plugin, econ);
+		//regsiter command listeners	
+		getCommand("cc").setExecutor(executor);
+		 new Company(configHandler);
 		 //register event listeners
 		 getServer().getPluginManager().registerEvents(new RegionEventListener(configHandler, this, logger, perms), this);
 		 getServer().getPluginManager().registerEvents(new PlayerEventHandler(this, perms), this);
-		//regsiter command listeners	
-		getCommand("cc").setExecutor(executor);
+		
 		 
 	}
 
@@ -106,23 +114,8 @@ public class CorporateCraft extends JavaPlugin {
 		
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	
 
 	}
 	
-	
-	
-	
-	
-	
-	
-
-
