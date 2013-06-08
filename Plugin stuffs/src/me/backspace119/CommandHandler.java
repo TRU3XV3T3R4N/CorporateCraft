@@ -28,7 +28,7 @@ public class CommandHandler implements CommandExecutor{
 		this.configHandler = configHandler;
 		this.plugin = plugin;
 		this.econ = econ;
-		company = new Company(configHandler);
+		company = new Company(configHandler, plugin);
 	}
 
 	
@@ -47,7 +47,7 @@ public class CommandHandler implements CommandExecutor{
 
 			Player player = (Player) sender;
 			
-			
+			List<String> pass = configHandler.getConfig().getStringList(player.getName());
 		if (args.length < 1)
 		{
 			player.sendMessage(indifferentColor() + "Corporate Craft v. " + plugin.getDescription().getVersion());
@@ -100,7 +100,7 @@ public class CommandHandler implements CommandExecutor{
 				}
 				}
 			} else {
-				sender.sendMessage(severeErrorColor() + "you do not have permission to Start a Company");
+				sender.sendMessage(severeErrorColor() + noPerm());
 			}
 		} else if (args[0].equals("Defaults")) {
 			plugin.saveDefaultConfig();
@@ -152,83 +152,243 @@ public class CommandHandler implements CommandExecutor{
 				}
 			} else {
 				
-				sender.sendMessage("You do not have permission to access a company account!");
+				sender.sendMessage(severeErrorColor() + noPerm());
 			}
 		}else if(args[0].equalsIgnoreCase("SetHiring"))
 		{
+			
 			if(args.length < 2)
 			{
 				player.sendMessage(syntaxErrorColor() + "Please put yes or no after SetHiring -- /cc SetHiring <yes|no>");
 			}else{
 				if(args[1].equalsIgnoreCase("yes"))
 				{
-					List<String> pass = configHandler.getConfig().getStringList(player.getName());
+					
 					if(pass.size() < 1)
 					{
-						player.sendMessage(severeErrorColor() + "You do not have permission to do this in any company");
+						player.sendMessage(severeErrorColor() + noPerm());
 						
 					}else if(pass.size() < 2)
 					{
+						
 						configHandler.getConfig().set("companies." + pass.get(0) + ".hiring", true);
-						configHandler.getConfig().getStringList("companies.hiring").addAll(pass);
+						List<String> list = configHandler.getConfig().getStringList("hiring");
+						list.add(pass.get(0));
+						configHandler.getConfig().set("hiring", list);
 						configHandler.saveConfig();
 					}else{
 						if(args.length < 3)
 						{
 						player.sendMessage(syntaxErrorColor() + "you have permission to do this in multiple companies. Please specify a company == /cc SetHiring <yes|no> <name_of_company>");
 						}else{
+							if(pass.contains(args[2]))
+							{
 							configHandler.getConfig().set("companies." + args[2] + ".hiring", true);
-							configHandler.getConfig().getStringList("hiring").add(args[2]);
-							List<String> pass2 = configHandler.getConfig().getStringList("hiring");
 							
+							List<String> list = configHandler.getConfig().getStringList("hiring");
+							
+							list.add(args[2]);
+							configHandler.getConfig().set("hiring", list);
 							configHandler.saveConfig();
+							}else{
+								player.sendMessage(severeErrorColor() + "You do not own that company!");
+							}
 						}
 						
 					}
 					
 				}else if(args[1].equalsIgnoreCase("no"))
 				{
-					List<String> pass = configHandler.getConfig().getStringList(player.getName());
+					
 					if(pass.size() < 1)
 					{
-						player.sendMessage(severeErrorColor() + "You do not have permission to do this in any company");
+						player.sendMessage(severeErrorColor() + noPerm());
 						
 					}else if(pass.size() < 2)
 					{
 						configHandler.getConfig().set("companies." + pass.get(0) + ".hiring", false);
-						configHandler.getConfig().getStringList("companies.hiring").removeAll(pass);
+						List<String> list = configHandler.getConfig().getStringList("companies.hiring");
+						list.remove(pass.get(0));
+						configHandler.getConfig().set("hiring", list);
 						configHandler.saveConfig();
 					}else{
 						if(args.length < 3)
 						{
+							
 						player.sendMessage(syntaxErrorColor() + "you have permission to do this in multiple companies. Please specify a company == /cc SetHiring <yes|no> <name_of_company>");
 						}else{
+							if(pass.contains(args[2]))
+							{		
+						
 							configHandler.getConfig().set("companies." + args[2] + ".hiring", false);
 							
-							List<String> pass1 = configHandler.getConfig().getStringList("hiring");
-							pass1.remove(args[2]);
-							configHandler.getConfig().set("hiring", pass1);
+							List<String> list = configHandler.getConfig().getStringList("hiring");
+							list.remove(args[2]);
+							configHandler.getConfig().set("hiring", list);
 							configHandler.saveConfig();
+						
+						}else{
+							player.sendMessage(severeErrorColor() + "You do not own that company!");
+						}
+					}
 						}
 						
-					}
+					
 				}
 			}
 		}else if(args[0].equalsIgnoreCase("Apply"))
 		{
-			if(args.length < 2)
+			if(perms.has(sender, "corporatecraft.apply"))
+			{
+			if(args.length < 3)
 			{
 				player.sendMessage(syntaxErrorColor() + "/cc Apply <companyName> <position>");
+			}else{
+				if(company.isHiring(args[1]))
+				{
+					company.apply(player.getName(), args[1], args[2]);
+				}
 			}
+			}else{
+				player.sendMessage(severeErrorColor() + noPerm());
+			}
+			
 		}else if(args[0].equalsIgnoreCase("hiring"))
 		{
 			player.sendMessage(noErrorColor() + "Companies currently hiring:");
-			List<String> pass = configHandler.getConfig().getStringList("hiring");
-			for (String company : pass) {
+			List<String> hiring = configHandler.getConfig().getStringList("hiring");
+			for (String company : hiring) {
 			    player.sendMessage(company);
 			}
 			
+		}else if(args[0].equalsIgnoreCase("info"))
+		{
+			if(args.length < 2)
+			{
+				player.sendMessage(syntaxErrorColor() + "/cc Info <companyName>");
+			}else{
+				player.sendMessage(configHandler.getConfig().getString("companies." + args[1] + ".description"));
+			}
+		}else if(args[0].equalsIgnoreCase("reviewApps"))
+		{
+			
+			if(pass.size() < 1)
+			{
+				player.sendMessage(severeErrorColor() + noPerm());
+			}else if(pass.size() < 2)
+			{
+				for(String applicant: company.reviewApplications(pass.get(0)))
+				{
+					player.sendMessage(applicant);
+				}
+			}else{
+				if(args.length < 2)
+				{
+					player.sendMessage(syntaxErrorColor() + "You have permission to do this in multiple companies please specify a name /cc ReviewApps <companyName>");
+					
+				}else{
+					for(String applicant: company.reviewApplications(args[1]))
+					{
+						player.sendMessage(applicant);
+					}
+				}
+			}
+		}else if(args[0].equalsIgnoreCase("hire"))
+		{
+			
+			if(pass.size() < 1)
+			{
+				player.sendMessage(severeErrorColor() + noPerm() );
+			}else if(pass.size() < 2)
+			{
+				if(!(args.length < 3 && args.length > 3))
+				{
+					if(!company.hire(args[1], args[2], args[3], player))
+					{
+						player.sendMessage(severeErrorColor() + "invalid position");
+					}
+				}else{
+					if(args.length == 4)
+					{
+						if(!company.hire(args[1], args[2], args[3], player))
+						{
+							player.sendMessage(severeErrorColor() + "invalid position");
+						}
+					}else{
+					player.sendMessage(syntaxErrorColor() + "not enough args must be: /cc Hire <applicant> <position> or /cc Hire <company> <appicant> <position>");
+					}
+					
+				}
+				
+			}else{
+				if(args.length < 4)
+				{
+					player.sendMessage(syntaxErrorColor() + "You have permission to do this in multiple companies please specify a company /cc Hire <company> <applicant> <position>" );
+					
+				}else{
+					company.hire(args[1], args[2], args[3], player);
+				}
+			}
+		}else if(args[0].equalsIgnoreCase("setDescription"))
+		{
+			if(pass.size() < 1)
+			{
+				player.sendMessage(severeErrorColor() + noPerm());
+			}else if(pass.size() < 2)
+			{
+				if(args.length > 1)
+				{
+				company.setDescription(pass.get(0), args[1]);
+				player.sendMessage(noErrorColor() + "You successfully changed the description of " + args[1]);
+				}else{
+					player.sendMessage(syntaxErrorColor() + "not enough arguements /cc setDescription <description> or /cc setDescription <company> <description");
+					
+				}
+			}else{
+				if(args.length < 2)
+				{
+					player.sendMessage(syntaxErrorColor() + "You have permission to do this in multiple companies please specify a company /cc setDescription <company> <description>");
+				}else{
+					company.setDescription(args[1], args[2]);
+					player.sendMessage(noErrorColor() + "You successfully changed the description of " + args[1]);
+				}
+			}
+		}else if(args[0].equalsIgnoreCase("addRegion"))
+		{
+			if(perms.has(sender, "corporatecraft.region.add"))
+			{
+				if(pass.size() < 1)
+				{
+					player.sendMessage(severeErrorColor() + noPerm());
+				}else if(pass.size() < 2)
+				{
+					if(args.length < 4)
+				if(!company.addRegion(pass.get(0), args[1], player, args[2]))
+				{
+					player.sendMessage(severeErrorColor() + "you cannot add this region as this type either the type is bad or you do not own the region");
+				}else{
+					player.sendMessage(noErrorColor() + "you have successfully added the region to your companies list");
+				}
+				}else{
+					if(args.length < 4)
+					{
+						player.sendMessage(syntaxErrorColor() + "You have permission to do this in multiple companies please speicify a company /cc add Region <company> <regionID> <regionType>");
+						
+					}else{
+						if(!company.addRegion(args[1], args[2], player, args[3]))
+						{
+							player.sendMessage(severeErrorColor() + "you cannot add this region as this type either the type is bad or you do not own the region");
+						}else{
+							player.sendMessage(noErrorColor() + "you have successfully added the region to your companies list");
+						}
+				
+					}
+				}
+			}else{
+				player.sendMessage(severeErrorColor() + noPerm());
+			}
 		}
+			
 			
 		}
 		
@@ -261,5 +421,8 @@ public class CommandHandler implements CommandExecutor{
 		return ChatColor.RED;
 	}
 	
-	
+	public String noPerm()
+	{
+		return "You do not have permission to do that";
+	}
 }

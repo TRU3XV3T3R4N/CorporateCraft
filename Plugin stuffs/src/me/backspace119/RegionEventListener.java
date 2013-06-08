@@ -69,6 +69,8 @@ System.out.println("made it into enter region event");
 				invConfig.storeInv(e.getPlayer());
 				tmpHandler.saveConfig();
 				e.getPlayer().getInventory().clear();
+				e.getPlayer().sendMessage("You have entered a region of the company you work for. Your inventory has been confiscated and will be returned after you leave");
+				
 				
 				}
 					

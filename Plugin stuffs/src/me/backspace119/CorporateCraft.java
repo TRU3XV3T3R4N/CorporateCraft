@@ -53,7 +53,7 @@ public class CorporateCraft extends JavaPlugin {
 		 CommandHandler executor = new CommandHandler(perms, logger, configHandler, plugin, econ);
 		//regsiter command listeners	
 		getCommand("cc").setExecutor(executor);
-		 new Company(configHandler);
+		 
 		 //register event listeners
 		 getServer().getPluginManager().registerEvents(new RegionEventListener(configHandler, this, logger, perms), this);
 		 getServer().getPluginManager().registerEvents(new PlayerEventHandler(this, perms), this);

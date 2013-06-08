@@ -7,18 +7,26 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 
 
 
 public class Company{
 	
 	ConfigHandler configHandler;
+	JavaPlugin plugin;
 	
-	public Company(ConfigHandler configHandler)
+	public Company(ConfigHandler configHandler, JavaPlugin plugin)
 	{
 		this.configHandler = configHandler;
+		this.plugin = plugin;
 	}
 	
 	public boolean startNew(String name, CommandSender sender, FileConfiguration config)
@@ -30,6 +38,8 @@ public class Company{
 		 sender.sendMessage(ChatColor.YELLOW + "You do not have enough money to start a new company! The cost is $" + startUpCosts);	
 		}else{
 		List<String> managers = Arrays.asList(sender.getName());
+		List<String> employees = Arrays.asList("");
+		List<String> regionsFiller = Arrays.asList("");
 		CorporateCraft.econ.createPlayerAccount(sender.getName() + "comp");
 		
 		CorporateCraft.econ.withdrawPlayer(sender.getName(), startUpCosts);
@@ -43,23 +53,25 @@ public class Company{
 		
 		//set the data in the companies.yml that coincides with defaults for a new company
 		//this will later be configurable inside the master config
-		configHandler.getConfig().set("companies" + "." + name + ".founder", sender.getName());
-		configHandler.getConfig().set("companies" + "." + name + ".owner", sender.getName());
-		configHandler.getConfig().set("companies" + "." + name + ".founded", dateFormat.format(date));
-		configHandler.getConfig().set("companies" + "." + name + ".managers", managers);
-		configHandler.getConfig().set("companies" + "." + name + ".hiring", false);
+		configHandler.getConfig().set("companies." + name + ".founder", sender.getName());
+		configHandler.getConfig().set("companies." + name + ".owner", sender.getName());
+		configHandler.getConfig().set("companies." + name + ".founded", dateFormat.format(date));
+		configHandler.getConfig().set("companies." + name + ".managers", managers);
+		configHandler.getConfig().set("companies." + name + ".hiring", false);
+		configHandler.getConfig().set("companies." + name + ".employees", employees);
+		configHandler.getConfig().set("companies." + name + ".regions.work", regionsFiller);
+		configHandler.getConfig().set("companies." + name + ".regions.store", regionsFiller);
+		configHandler.getConfig().set("companies." + name + ".regions.hq", regionsFiller);
+		configHandler.getConfig().set("companies." + name + ".stockValue", -1.00);
+		configHandler.getConfig().set("companies." + name + ".stockShares", -1.00);
+		configHandler.getConfig().set("companies." + name + ".description", "default description");
+			List<String> applicants = Arrays.asList("");
+			configHandler.getConfig().set("companies." + name + ".applicants", applicants);
+			List<String> list = configHandler.getConfig().getStringList(sender.getName());
 		
-		configHandler.getConfig().set("companies" + "." + name + ".stockValue", -1.00);
-		configHandler.getConfig().set("companies" + "." + name + ".stockShares", -1.00);
-		if(configHandler.getConfig().contains(sender.getName()))
-		{
-		configHandler.getConfig().getStringList(sender.getName()).add(name);
-		}else{
-			List<String> list = Arrays.asList(name);
+			list.add(name);
 			configHandler.getConfig().set(sender.getName(), list);
-		}
-		
-		
+
 		 configHandler.saveConfig();
 		
 		}
@@ -86,8 +98,101 @@ public class Company{
 		//will have to run economy entirely through corporatecraft in order to delete
 		//the account correctly
 	}
+	public boolean apply(String playerName, String companyName, String position)
+	{
+		//redundant eh? only seems to work like this though. Calling .add() on getStringList() wont update the config for some reason
+		List<String> applicants = configHandler.getConfig().getStringList("companies." + companyName + ".applicants");
+		applicants.add(playerName + " - applied for " + ChatColor.GREEN + position);
+		configHandler.getConfig().set("copmanies." + companyName + ".applicants", applicants);
+		
+		return true;
+	}
+
 	
+	public boolean clearApplications(String companyName)
+	{
+		//make empty list to clear the applications (maybe just use .clear() in the future *.*
+		 List<String> list = Arrays.asList("");
+		configHandler.getConfig().set("companies." + companyName + ".applicants", list);
+		
+		return true;
+	}
 	
+	public List<String> reviewApplications(String companyName)
+	{
+		//return the list of applicants so it can be iterated through and sent back
+		List<String> applicants = configHandler.getConfig().getStringList("companies." + companyName + ".applicants");
+		
+		return applicants;
+	}
 	
+	public boolean hire(String companyName, String applicant, String position, Player p)
+	{
+		
+		
+		
+		if(position.equalsIgnoreCase("worker"))
+		{
+			List<String> employees = configHandler.getConfig().getStringList("companies." + companyName + ".employees");
+			employees.add(applicant);
+			configHandler.getConfig().set("companies." + companyName + ".employees", employees);
+			configHandler.saveConfig();
+			WorldGuardPlugin wgplugin = (WorldGuardPlugin) plugin.getServer().getPluginManager().getPlugin("WorldGuard");
+			World world = p.getWorld();
+			RegionManager manager = wgplugin.getRegionManager(world);
+			String[] toAdd = new String[]{applicant};
+			for(String regionId : configHandler.getConfig().getStringList("companies." + companyName + ".regions.work"))
+			{
+				
+				RegionDBUtil.addToDomain(manager.getRegion(regionId).getMembers(),toAdd, 0);
+			}
+			return true;
+		}else if(position.equalsIgnoreCase("manager"))
+		{
+			List<String> managers = configHandler.getConfig().getStringList("companies." + companyName + ".managers");
+			managers.add(applicant);
+			configHandler.getConfig().set("companies." + companyName + ".managers", managers);
+			configHandler.saveConfig();
+			return true;
+		}
+		
+		return false;
+	}
+	public void setDescription(String company, String description)
+	{
+		configHandler.getConfig().set("companies." + company + ".description", description);
+		configHandler.saveConfig();
+	}
+	
+	public boolean isHiring(String company)
+	{
+		return configHandler.getConfig().getBoolean("companies." + company + ".hiring");
+	}
+	
+	public boolean addRegion(String company, String regionID, Player p, String type)
+	{
+		
+		WorldGuardPlugin wgplugin = (WorldGuardPlugin) plugin.getServer().getPluginManager().getPlugin("WorldGuard");
+		World world = p.getWorld();
+		RegionManager manager = wgplugin.getRegionManager(world);
+		if(manager.getRegion(regionID).getOwners().contains(p.getName()))
+		{
+			if(type.equals("hq") || type.equals("work") || type.equals("store"))
+			{
+				List<String> companyLand = configHandler.getConfig().getStringList("companyLand");
+				List<String> thisCompaniesLand = configHandler.getConfig().getStringList("companies." + company + ".regions." + type);
+				companyLand.add(regionID);
+				thisCompaniesLand.add(regionID);
+				configHandler.getConfig().set("companyLand", companyLand);
+				configHandler.getConfig().set("companies." + company + "regions." + type, thisCompaniesLand);
+				configHandler.saveConfig();
+				return true;
+			}else{
+			return false;
+			}
+		}
+		
+		return false;
+	}
 	
 }
