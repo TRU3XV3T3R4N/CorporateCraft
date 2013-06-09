@@ -19,7 +19,7 @@ public class CommandHandler implements CommandExecutor{
 	private Logger logger;
 	private Economy econ;
 	private ConfigHandler configHandler;
-	private static Company company;
+	
 	private JavaPlugin plugin;
 	public CommandHandler(Permission perms, Logger logger, ConfigHandler configHandler, JavaPlugin plugin, Economy econ)
 	{
@@ -28,7 +28,7 @@ public class CommandHandler implements CommandExecutor{
 		this.configHandler = configHandler;
 		this.plugin = plugin;
 		this.econ = econ;
-		company = new Company(configHandler, plugin);
+		
 	}
 
 	
@@ -47,7 +47,7 @@ public class CommandHandler implements CommandExecutor{
 
 			Player player = (Player) sender;
 			
-			List<String> pass = configHandler.getConfig().getStringList(player.getName());
+			//List<String> pass = configHandler.getConfig().getStringList(player.getName());
 		if (args.length < 1)
 		{
 			player.sendMessage(indifferentColor() + "Corporate Craft v. " + plugin.getDescription().getVersion());
@@ -89,15 +89,15 @@ public class CommandHandler implements CommandExecutor{
 					sender.sendMessage(severeErrorColor()
 							+ "PLEASE INPUT NAME OF NEW COMPANY == /cc Start <name_of_new_company");
 				} else {
-					if(company.startNew(args[1], sender, plugin.getConfig()))
-					{
-						logger.severe(severeErrorColor() + "ERROR WHILE CREATING COMPANY -- PROBABLY AN ERROR WHILE SAVING CONFIG");
-					}else{
+					Company comp = new Company(configHandler, plugin, plugin.getConfig(), player, args[1]);
+					
+						
+					
 					logger.info(sender.getName() + " HAS STARTED COMPANY " + args[1]);
 					sender.sendMessage(congratulationsColor() + "Congratulations! you have begun company "+ args[1] + " successfully type /cc Access to access the account");
 					
 					return true;
-				}
+				
 				}
 			} else {
 				sender.sendMessage(severeErrorColor() + noPerm());
