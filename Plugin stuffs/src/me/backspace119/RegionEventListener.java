@@ -44,7 +44,7 @@ System.out.println("made it into enter region event");
 		{
 			if(!perms.has(e.getPlayer(), "corporatecraft.override.regions"))
 			{
-			//checks if theyre a member of the region (meaning a member of the company)
+			//checks if they're a member of the region (meaning a member of the company)
 		if(e.getRegion().isMember(e.getPlayer().getName()))
 		{
 			
@@ -53,7 +53,7 @@ System.out.println("made it into enter region event");
 			//this is just to remind me (backspace119) about the existance of this method and how to use it
 			//RegionDBUtil.addToDomain(e.getRegion().getMembers(),(String[]) configHandler.getConfig().getList("").toArray(), 0);
 			
-			//if their the owner they dont need their inventory cleared
+			//if they're the owner they dont need their inventory cleared
 			if(!e.getRegion().isOwner(e.getPlayer().getName()))
 			{
 				Utils.playerInCompanyPlot.add(e.getPlayer().getName());
