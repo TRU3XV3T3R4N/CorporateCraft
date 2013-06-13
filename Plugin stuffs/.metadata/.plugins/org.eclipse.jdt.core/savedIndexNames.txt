@@ -1,0 +1,1 @@
+INDEX VERSION 1.126+F:\Documents and Settings\Owner\My Documents\GitHub\CorporateCraft\Plugin stuffs\.metadata\.plugins\org.eclipse.jdt.core

@@ -5,11 +5,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,15 +16,34 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 
 
-
+/**
+ * 
+ * @author backspace119
+ *
+ *This is the corporate craft plugin for bukkit type servers
+ *Copyright (C) 2013  backspace119 
+ *
+ *This program is free software; you can redistribute it and/or
+ *modify it under the terms of the GNU General Public License
+ *as published by the Free Software Foundation; either version 2
+ *of the License, or (at your option) any later version.
+ *
+ *This program is distributed in the hope that it will be useful,
+ *but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *GNU General Public License for more details.
+ *
+ *
+ */
 public class Company{
 	
 	ConfigHandler configHandler;
 	JavaPlugin plugin;
 	private final String name;
 	private final Player owner;
-	
-	
+	private int level;
+	private int xp;
+	private List<Integer> keep;
 	public Company(ConfigHandler configHandler, JavaPlugin plugin, FileConfiguration config, Player player, String name)
 	{
 		this.configHandler = configHandler;
@@ -34,7 +51,8 @@ public class Company{
 		this.owner = player;
 		this.name = name;
 	
-	
+		level = 1;
+		xp = 0;
 		
 		int startUpCosts = config.getInt("startcost");
 		if(!CorporateCraft.econ.has(player.getName(), startUpCosts))
@@ -68,6 +86,8 @@ public class Company{
 		configHandler.getConfig().set("companies." + name + ".stockValue", -1.00);
 		configHandler.getConfig().set("companies." + name + ".stockShares", -1.00);
 		configHandler.getConfig().set("companies." + name + ".description", "default description");
+		configHandler.getConfig().set("companies." + name + ".level", level);
+		configHandler.getConfig().set("companies." + name + ".xp", xp);
 		List<String> applicants = Arrays.asList("");
 		configHandler.getConfig().set("companies." + name + ".applicants", applicants);
 
@@ -201,4 +221,46 @@ public class Company{
 		return false;
 	}
 	
+	public void saveCompany()
+	{
+		configHandler.saveConfig();
+	}
+	
+	public List<Integer> keepsOnLeave()
+	{
+		keep = configHandler.getConfig().getIntegerList("companies." + name + ".keeps");
+		return keep;
+	}
+	public boolean addKeep(int materialID)
+	{
+		if(keep.size() < amountAllowedToKeep())
+		{
+			keep.add(materialID);
+			return true;
+		}else{
+			return false;
+		}
+		
+	}
+	public boolean removeKeep(int materialID)
+	{
+		return keep.remove(materialID) != null;
+	}
+	private int amountAllowedToKeep()
+	{
+		if(level < 5)
+		{
+			return 5;
+		}else if(level < 10)
+		{
+			return 10;
+		}else if(level < 15)
+		{
+			return 15;
+		}else if(level < 20)
+		{
+			return 20;
+		}
+		return 0;
+	}
 }

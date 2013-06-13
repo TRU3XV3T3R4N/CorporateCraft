@@ -9,7 +9,25 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-
+/**
+ * 
+ * @author backspace119
+ *
+ *This is the corporate craft plugin for bukkit type servers
+ *Copyright (C) 2013  backspace119 
+ *
+ *This program is free software; you can redistribute it and/or
+ *modify it under the terms of the GNU General Public License
+ *as published by the Free Software Foundation; either version 2
+ *of the License, or (at your option) any later version.
+ *
+ *This program is distributed in the hope that it will be useful,
+ *but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *GNU General Public License for more details.
+ *
+ *
+ */
 public class CorporateCraft extends JavaPlugin {
 
 	public final Logger logger = Logger.getLogger("Minecraft");
@@ -114,7 +132,6 @@ public class CorporateCraft extends JavaPlugin {
 		
 	}
 	
-
 	
 
 	}

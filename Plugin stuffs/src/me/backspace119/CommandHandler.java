@@ -13,7 +13,25 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import org.bukkit.plugin.java.JavaPlugin;
-
+/**
+ * 
+ * @author backspace119
+ *
+ *This is the corporate craft plugin for bukkit type servers
+ *Copyright (C) 2013  backspace119 
+ *
+ *This program is free software; you can redistribute it and/or
+ *modify it under the terms of the GNU General Public License
+ *as published by the Free Software Foundation; either version 2
+ *of the License, or (at your option) any later version.
+ *
+ *This program is distributed in the hope that it will be useful,
+ *but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *GNU General Public License for more details.
+ *
+ *
+ */
 public class CommandHandler implements CommandExecutor{
 	private Permission perms;
 	private Logger logger;
@@ -87,14 +105,14 @@ public class CommandHandler implements CommandExecutor{
 			if (perms.has(sender, "corporatecraft.ccStart")) {
 				if (args.length < 2) {
 					sender.sendMessage(severeErrorColor()
-							+ "PLEASE INPUT NAME OF NEW COMPANY == /cc Start <name_of_new_company");
+							+ "PLEASE INPUT NAME OF NEW Utils.getCompany(configHandler.getConfig().getString(player.getName())) == /cc Start <name_of_new_Utils.getCompany(configHandler.getConfig().getString(player.getName()))");
 				} else {
 					Company comp = new Company(configHandler, plugin, plugin.getConfig(), player, args[1]);
-					
+					comp.saveCompany();
 						
 					
 					logger.info(sender.getName() + " HAS STARTED COMPANY " + args[1]);
-					sender.sendMessage(congratulationsColor() + "Congratulations! you have begun company "+ args[1] + " successfully type /cc Access to access the account");
+					sender.sendMessage(congratulationsColor() + "Congratulations! you have begun Company "+ args[1] + " successfully. Type /cc Access to access the account");
 					
 					return true;
 				
@@ -120,13 +138,13 @@ public class CommandHandler implements CommandExecutor{
 				{
 					if(econ.hasAccount(player.getName() + "comp"))
 					{
-						sender.sendMessage(noErrorColor() + "Current company balance: " + String.valueOf(econ.getBalance(player.getName() + "comp")));
+						sender.sendMessage(noErrorColor() + "Current Utils.getCompany(configHandler.getConfig().getString(player.getName())) balance: " + String.valueOf(econ.getBalance(player.getName() + "comp")));
 						sender.sendMessage(indifferentColor() + "/cc Access withdraw <amount>");
 						sender.sendMessage(indifferentColor() + "/cc Access deposit <amount>");
 						
 						return true;
 					} else {
-						sender.sendMessage(severeErrorColor() + "You do not own a company");
+						sender.sendMessage(severeErrorColor() + "You do not own a Utils.getCompany(configHandler.getConfig().getString(player.getName()))");
 						return false;
 					}
 				} else {
@@ -164,74 +182,35 @@ public class CommandHandler implements CommandExecutor{
 				if(args[1].equalsIgnoreCase("yes"))
 				{
 					
-					if(pass.size() < 1)
+					if(configHandler.getConfig().getString(player.getName()).equalsIgnoreCase(""))
 					{
 						player.sendMessage(severeErrorColor() + noPerm());
 						
-					}else if(pass.size() < 2)
-					{
+					}else{
 						
-						configHandler.getConfig().set("companies." + pass.get(0) + ".hiring", true);
+						configHandler.getConfig().set("companies." + configHandler.getConfig().getString(player.getName()) + ".hiring", true);
 						List<String> list = configHandler.getConfig().getStringList("hiring");
-						list.add(pass.get(0));
+						list.add(configHandler.getConfig().getString(player.getName()));
 						configHandler.getConfig().set("hiring", list);
 						configHandler.saveConfig();
-					}else{
-						if(args.length < 3)
-						{
-						player.sendMessage(syntaxErrorColor() + "you have permission to do this in multiple companies. Please specify a company == /cc SetHiring <yes|no> <name_of_company>");
-						}else{
-							if(pass.contains(args[2]))
-							{
-							configHandler.getConfig().set("companies." + args[2] + ".hiring", true);
-							
-							List<String> list = configHandler.getConfig().getStringList("hiring");
-							
-							list.add(args[2]);
-							configHandler.getConfig().set("hiring", list);
-							configHandler.saveConfig();
-							}else{
-								player.sendMessage(severeErrorColor() + "You do not own that company!");
-							}
-						}
+					
 						
 					}
 					
 				}else if(args[1].equalsIgnoreCase("no"))
 				{
 					
-					if(pass.size() < 1)
+					if(configHandler.getConfig().getString(player.getName()).equalsIgnoreCase(""))
 					{
 						player.sendMessage(severeErrorColor() + noPerm());
 						
-					}else if(pass.size() < 2)
-					{
-						configHandler.getConfig().set("companies." + pass.get(0) + ".hiring", false);
+					}else{
+						configHandler.getConfig().set("companies." + configHandler.getConfig().getString(player.getName()) + ".hiring", false);
 						List<String> list = configHandler.getConfig().getStringList("companies.hiring");
-						list.remove(pass.get(0));
+						list.remove(configHandler.getConfig().getString(player.getName()));
 						configHandler.getConfig().set("hiring", list);
 						configHandler.saveConfig();
-					}else{
-						if(args.length < 3)
-						{
-							
-						player.sendMessage(syntaxErrorColor() + "you have permission to do this in multiple companies. Please specify a company == /cc SetHiring <yes|no> <name_of_company>");
-						}else{
-							if(pass.contains(args[2]))
-							{		
-						
-							configHandler.getConfig().set("companies." + args[2] + ".hiring", false);
-							
-							List<String> list = configHandler.getConfig().getStringList("hiring");
-							list.remove(args[2]);
-							configHandler.getConfig().set("hiring", list);
-							configHandler.saveConfig();
-						
-						}else{
-							player.sendMessage(severeErrorColor() + "You do not own that company!");
-						}
 					}
-						}
 						
 					
 				}
@@ -242,11 +221,11 @@ public class CommandHandler implements CommandExecutor{
 			{
 			if(args.length < 3)
 			{
-				player.sendMessage(syntaxErrorColor() + "/cc Apply <companyName> <position>");
+				player.sendMessage(syntaxErrorColor() + "/cc Apply <Utils.getCompany(configHandler.getConfig().getString(player.getName()))Name> <position>");
 			}else{
-				if(company.isHiring(args[1]))
+				if(Utils.getCompany(configHandler.getConfig().getString(args[1])).isHiring())
 				{
-					company.apply(player.getName(), args[1], args[2]);
+					Utils.getCompany(configHandler.getConfig().getString(args[1])).apply(player.getName(), args[2]);
 				}
 			}
 			}else{
@@ -257,132 +236,76 @@ public class CommandHandler implements CommandExecutor{
 		{
 			player.sendMessage(noErrorColor() + "Companies currently hiring:");
 			List<String> hiring = configHandler.getConfig().getStringList("hiring");
-			for (String company : hiring) {
-			    player.sendMessage(company);
+			for (String comp : hiring) {
+			    player.sendMessage(comp);
 			}
 			
 		}else if(args[0].equalsIgnoreCase("info"))
 		{
 			if(args.length < 2)
 			{
-				player.sendMessage(syntaxErrorColor() + "/cc Info <companyName>");
+				player.sendMessage(syntaxErrorColor() + "/cc Info <Utils.getCompany(configHandler.getConfig().getString(player.getName()))Name>");
 			}else{
 				player.sendMessage(configHandler.getConfig().getString("companies." + args[1] + ".description"));
 			}
 		}else if(args[0].equalsIgnoreCase("reviewApps"))
 		{
 			
-			if(pass.size() < 1)
+			if(configHandler.getConfig().getString(player.getName()).equalsIgnoreCase(""))
 			{
 				player.sendMessage(severeErrorColor() + noPerm());
-			}else if(pass.size() < 2)
-			{
-				for(String applicant: company.reviewApplications(pass.get(0)))
+			}else{
+				for(String applicant: Utils.getCompany(configHandler.getConfig().getString(player.getName())).reviewApplications())
 				{
 					player.sendMessage(applicant);
-				}
-			}else{
-				if(args.length < 2)
-				{
-					player.sendMessage(syntaxErrorColor() + "You have permission to do this in multiple companies please specify a name /cc ReviewApps <companyName>");
-					
-				}else{
-					for(String applicant: company.reviewApplications(args[1]))
-					{
-						player.sendMessage(applicant);
-					}
 				}
 			}
 		}else if(args[0].equalsIgnoreCase("hire"))
 		{
 			
-			if(pass.size() < 1)
+			if(configHandler.getConfig().getString(player.getName()).equalsIgnoreCase(""))
 			{
 				player.sendMessage(severeErrorColor() + noPerm() );
-			}else if(pass.size() < 2)
-			{
+			}else{
 				if(!(args.length < 3 && args.length > 3))
 				{
-					if(!company.hire(args[1], args[2], args[3], player))
+					if(!Utils.getCompany(configHandler.getConfig().getString(player.getName())).hire(args[1], args[2], player))
 					{
 						player.sendMessage(severeErrorColor() + "invalid position");
 					}
-				}else{
-					if(args.length == 4)
-					{
-						if(!company.hire(args[1], args[2], args[3], player))
-						{
-							player.sendMessage(severeErrorColor() + "invalid position");
-						}
-					}else{
-					player.sendMessage(syntaxErrorColor() + "not enough args must be: /cc Hire <applicant> <position> or /cc Hire <company> <appicant> <position>");
-					}
-					
 				}
 				
-			}else{
-				if(args.length < 4)
-				{
-					player.sendMessage(syntaxErrorColor() + "You have permission to do this in multiple companies please specify a company /cc Hire <company> <applicant> <position>" );
-					
-				}else{
-					company.hire(args[1], args[2], args[3], player);
-				}
-			}
+			}	
 		}else if(args[0].equalsIgnoreCase("setDescription"))
 		{
-			if(pass.size() < 1)
+			if(configHandler.getConfig().getString(player.getName()).equalsIgnoreCase(""))
 			{
 				player.sendMessage(severeErrorColor() + noPerm());
-			}else if(pass.size() < 2)
-			{
+			}else{
 				if(args.length > 1)
 				{
-				company.setDescription(pass.get(0), args[1]);
-				player.sendMessage(noErrorColor() + "You successfully changed the description of " + args[1]);
+				Utils.getCompany(configHandler.getConfig().getString(player.getName())).setDescription(args[1]);
+				player.sendMessage(noErrorColor() + "You successfully changed the description of " + configHandler.getConfig().getString(player.getName()));
 				}else{
-					player.sendMessage(syntaxErrorColor() + "not enough arguements /cc setDescription <description> or /cc setDescription <company> <description");
+					player.sendMessage(syntaxErrorColor() + "not enough arguements /cc setDescription <description> or /cc setDescription <Utils.getCompany(configHandler.getConfig().getString(player.getName()))> <description");
 					
-				}
-			}else{
-				if(args.length < 2)
-				{
-					player.sendMessage(syntaxErrorColor() + "You have permission to do this in multiple companies please specify a company /cc setDescription <company> <description>");
-				}else{
-					company.setDescription(args[1], args[2]);
-					player.sendMessage(noErrorColor() + "You successfully changed the description of " + args[1]);
 				}
 			}
 		}else if(args[0].equalsIgnoreCase("addRegion"))
 		{
 			if(perms.has(sender, "corporatecraft.region.add"))
 			{
-				if(pass.size() < 1)
+				if(configHandler.getConfig().getString(player.getName()).equalsIgnoreCase(""))
 				{
 					player.sendMessage(severeErrorColor() + noPerm());
-				}else if(pass.size() < 2)
-				{
+				}else{
 					if(args.length < 4)
-				if(!company.addRegion(pass.get(0), args[1], player, args[2]))
+				if(!Utils.getCompany(configHandler.getConfig().getString(player.getName())).addRegion( args[1], player, args[2]))
 				{
 					player.sendMessage(severeErrorColor() + "you cannot add this region as this type either the type is bad or you do not own the region");
 				}else{
 					player.sendMessage(noErrorColor() + "you have successfully added the region to your companies list");
 				}
-				}else{
-					if(args.length < 4)
-					{
-						player.sendMessage(syntaxErrorColor() + "You have permission to do this in multiple companies please speicify a company /cc add Region <company> <regionID> <regionType>");
-						
-					}else{
-						if(!company.addRegion(args[1], args[2], player, args[3]))
-						{
-							player.sendMessage(severeErrorColor() + "you cannot add this region as this type either the type is bad or you do not own the region");
-						}else{
-							player.sendMessage(noErrorColor() + "you have successfully added the region to your companies list");
-						}
-				
-					}
 				}
 			}else{
 				player.sendMessage(severeErrorColor() + noPerm());
