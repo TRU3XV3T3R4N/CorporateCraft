@@ -91,38 +91,43 @@ public class CommandHandler implements CommandExecutor{
 				}
 				return true;
 			} else {
-				sender.sendMessage(severeErrorColor()
+				player.sendMessage(severeErrorColor()
 						+ "you do not have permission to heal");
 			}
 
 		} else if (args[0].equals("test-permission")) {
 
 			if (perms.has(player, "example.plugin.awesome")) {
-				sender.sendMessage(noErrorColor() + "You are awesome!");
+				player.sendMessage(noErrorColor() + "You are awesome!");
 				return true;
 			} else {
-				sender.sendMessage(severeErrorColor() + "You suck!");
+				player.sendMessage(severeErrorColor() + "You suck!");
 				return false;
 			}
 
 		} else if (args[0].equalsIgnoreCase("Start")) {
 			if (perms.has(sender, "corporatecraft.ccStart")) {
 				if (args.length < 2) {
-					sender.sendMessage(severeErrorColor()
+					player.sendMessage(severeErrorColor()
 							+ "PLEASE INPUT NAME OF NEW Utils.getCompany(configHandler.getConfig().getString(player.getName())) == /cc Start <name_of_new_Utils.getCompany(configHandler.getConfig().getString(player.getName()))");
 				} else {
+					if(Utils.getCompany(args[1]) != null)
+					{
+					player.sendMessage(severeErrorColor() + "a company with that name already exists");
+					return false;
+					}else{
 					Company comp = new Company(configHandler, plugin, plugin.getConfig(), player, args[1]);
 					comp.saveCompany();
-						
+					}
 					
-					logger.info(sender.getName() + " HAS STARTED COMPANY " + args[1]);
-					sender.sendMessage(congratulationsColor() + "Congratulations! you have begun Company "+ args[1] + " successfully. Type /cc Access to access the account");
+					logger.info(player.getName() + " HAS STARTED COMPANY " + args[1]);
+					player.sendMessage(congratulationsColor() + "Congratulations! you have begun Company "+ args[1] + " successfully. Type /cc Access to access the account");
 					
 					return true;
 				
 				}
 			} else {
-				sender.sendMessage(severeErrorColor() + noPerm());
+				player.sendMessage(severeErrorColor() + noPerm());
 			}
 		} else if (args[0].equals("Defaults")) {
 			plugin.saveDefaultConfig();
