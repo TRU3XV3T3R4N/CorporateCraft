@@ -3,11 +3,14 @@ package me.backspace119;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mewin.WGRegionEvents.events.RegionEnterEvent;
@@ -44,7 +47,7 @@ System.out.println("made it into enter region event");
 		{
 			if(!perms.has(e.getPlayer(), "corporatecraft.override.regions"))
 			{
-			//checks if theyre a member of the region (meaning a member of the company)
+			//checks if they're a member of the region (meaning a member of the company)
 		if(e.getRegion().isMember(e.getPlayer().getName()))
 		{
 			
@@ -53,7 +56,7 @@ System.out.println("made it into enter region event");
 			//this is just to remind me (backspace119) about the existance of this method and how to use it
 			//RegionDBUtil.addToDomain(e.getRegion().getMembers(),(String[]) configHandler.getConfig().getList("").toArray(), 0);
 			
-			//if their the owner they dont need their inventory cleared
+			//if they're the owner they dont need their inventory cleared
 			if(!e.getRegion().isOwner(e.getPlayer().getName()))
 			{
 				Utils.playerInCompanyPlot.add(e.getPlayer().getName());
@@ -105,10 +108,35 @@ System.out.println("made it into enter region event");
 				
 				tmpHandler.saveConfig();
 				
-				
+				if(e.getRegion().getId().equalsIgnoreCase(Utils.companyLandMap.get(configHandler.getConfig().getString(e.getPlayer().getName()))))
+					{
+					Company comp = Utils.getCompany(configHandler.getConfig().getString(e.getPlayer().getName()));
+					List<Integer> keep = comp.keepsOnLeave();
+					List<ItemStack> stack;
+					if(BufferedInventoryHandler.getFile(configHandler.getConfig().getString(e.getPlayer().getName())) == null)
+							{
+								ItemStack[] pass = new ItemStack[0];
+								stack = Arrays.asList(pass);
+							}else{
+								stack = Arrays.asList(BufferedInventoryHandler.getBufferedInv(configHandler.getConfig().getString(e.getPlayer().getName())));
+							}
+					for(int materialID : keep)
+					{
+						for(int i = 0; i < e.getPlayer().getInventory().getSize(); i++)
+						{
+						if(e.getPlayer().getInventory().getItem(i).getType().getId() == materialID)
+						{
+							stack.add(e.getPlayer().getInventory().getItem(i));
+							CorporateCraft.econ.depositPlayer(e.getPlayer().getName(), configHandler.getConfig().getDouble("companies." + configHandler.getConfig().getString(e.getPlayer().getName()) + "." + materialID) * e.getPlayer().getInventory().getItem(i).getAmount());
+						}
+						}
+						BufferedInventoryHandler.storeBufferedInv(configHandler.getConfig().getString(e.getPlayer().getName()), stack.toArray(new ItemStack[stack.size()]));
+					}
+					invConfig.restoreInv(e.getPlayer());
+					}
 				 
 				
-				invConfig.restoreInv(e.getPlayer());
+				
 				
 			}
 			}

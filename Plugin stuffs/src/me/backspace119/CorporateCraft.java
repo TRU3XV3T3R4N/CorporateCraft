@@ -45,7 +45,7 @@ public class CorporateCraft extends JavaPlugin {
 			return;
 		}else if(!setupWorldGuard())
 		{
-			logger.info(String.format("[%s] - Disabled due to no WorldGuard dependency found!",getDescription().getName()));
+			logger.info(String.format("[%s] - Disabled due to no WorldGuard or WorldGuard Extension dependency found!",getDescription().getName()));
 			getServer().getPluginManager().disablePlugin(this);
 		}
 		plugin = this;
@@ -74,7 +74,7 @@ public class CorporateCraft extends JavaPlugin {
 		 
 		 //register event listeners
 		 getServer().getPluginManager().registerEvents(new RegionEventListener(configHandler, this, logger, perms), this);
-		 getServer().getPluginManager().registerEvents(new PlayerEventHandler(this, perms), this);
+		 getServer().getPluginManager().registerEvents(new PlayerEventHandler(this, perms, configHandler), this);
 		
 		 
 	}
@@ -92,6 +92,12 @@ public class CorporateCraft extends JavaPlugin {
 	{
 		if (getServer().getPluginManager().getPlugin("WorldGuard") == null) {
 			logger.severe("WORLDGUARD NOT FOUND!");
+			return false;
+		}else if(getServer().getPluginManager().getPlugin("WGRegionEvents") == null){
+			logger.severe("WGRegionEvents NOT FOUND!");
+			return false;
+		}else if(getServer().getPluginManager().getPlugin("WGCustomFlags") == null){
+			logger.severe("WGCustomFlags NOT FOUND!");
 			return false;
 		}else{
 			return true;

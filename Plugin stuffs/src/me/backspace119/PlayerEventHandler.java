@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
@@ -16,12 +17,13 @@ public class PlayerEventHandler implements Listener{
 
 	JavaPlugin plugin;
 	Permission perms;
-	public PlayerEventHandler(JavaPlugin plugin, Permission perms)
+	ConfigHandler configHandler;
+	public PlayerEventHandler(JavaPlugin plugin, Permission perms, ConfigHandler configHandler)
 	{
 		
 		this.plugin = plugin;
 		this.perms = perms;
-		
+		this.configHandler = configHandler;
 	}
 	
 	
@@ -40,5 +42,13 @@ public class PlayerEventHandler implements Listener{
 			
 		}
 		
+	}
+	
+	public void onPlayerJoin(PlayerJoinEvent e)
+	{
+		if(configHandler.getConfig().getString(e.getPlayer().getName()) == null)
+		{
+			configHandler.getConfig().set(e.getPlayer().getName(), "");
+		}
 	}
 }

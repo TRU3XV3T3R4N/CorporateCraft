@@ -1,1 +1,3 @@
 startcost: 1000.00
+#in percentage
+taxRate: 3

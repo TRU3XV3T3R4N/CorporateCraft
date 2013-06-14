@@ -1,6 +1,6 @@
 name: CorporateCraft
 main: me.backspace119.CorporateCraft
-version: 0.2.9
+version: 0.3
 description: >
              Corporation plugin to implement companies into Bukkit
 commands:
@@ -36,6 +36,14 @@ commands:
     description: apply for a job at a hiring company
   cc addRegion:
     description: adds a region to a companies list and the server wide list WARNING ONLY VALID IN THE WORLD THE PLAYER IS STANDING IN AT CURRENT MOMENT!
+  cc ChangeCompany:
+    description: sets a players company assignment to a different one //cc ChangeCompany <player> <company>
+  cc GetProduct:
+    description: gets the product created by company employees
+  cc addKeep:
+    description: adds an item id to keep from employees leaving a company plot
+  cc removeKeep:
+    description: removes an item id to keep from employees leaving a company plot
 permissions:
   corporatecraft.*:
     description: gives access to all corporatecraft commands
@@ -54,4 +62,10 @@ permissions:
     default: false
     children: 
       corporatecraft.override.regions: true
-depend: [Vault, WorldGuard]
+      corporatecraft.override.setCompany: true
+  corporatecraft.admin.*:
+    description: gives admin perms to the player--not quite as powerful as override
+    default: false
+    children:
+      corporatecraft.admin.setCompany: true
+depend: [Vault, WorldGuard, WGCustomFlags, WGRegionEvents]

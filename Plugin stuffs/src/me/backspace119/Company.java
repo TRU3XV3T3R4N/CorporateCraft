@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -44,6 +45,7 @@ public class Company{
 	private int level;
 	private int xp;
 	private List<Integer> keep;
+	
 	public Company(ConfigHandler configHandler, JavaPlugin plugin, FileConfiguration config, Player player, String name)
 	{
 		this.configHandler = configHandler;
@@ -62,6 +64,7 @@ public class Company{
 		List<String> managers = Arrays.asList(player.getName());
 		List<String> employees = Arrays.asList("");
 		List<String> regionsFiller = Arrays.asList("");
+		keep.add(Material.COBBLESTONE.getId(), Material.STONE.getId());
 		CorporateCraft.econ.createPlayerAccount(name + "CORPORATECRAFT");
 		
 		CorporateCraft.econ.withdrawPlayer(player.getName(), startUpCosts);
@@ -88,9 +91,15 @@ public class Company{
 		configHandler.getConfig().set("companies." + name + ".description", "default description");
 		configHandler.getConfig().set("companies." + name + ".level", level);
 		configHandler.getConfig().set("companies." + name + ".xp", xp);
+		configHandler.getConfig().set("companies." + name + ".keeps", keep);
+		configHandler.getConfig().set("companies." + name + "." + Material.STONE.getId(), 0.75);
+		configHandler.getConfig().set("companies." + name + "." + Material.COBBLESTONE.getId(), 0.50);
+		
 		List<String> applicants = Arrays.asList("");
 		configHandler.getConfig().set("companies." + name + ".applicants", applicants);
-
+		List<String> companyNames = configHandler.getConfig().getStringList("companyNames");
+		companyNames.add(name);
+		configHandler.getConfig().set("companyNames", companyNames);
 		configHandler.getConfig().set(player.getName(), name);
 
 		configHandler.saveConfig();
@@ -98,6 +107,17 @@ public class Company{
 		Utils.companyMap.put(name, this);
 		
 		}
+		
+	}
+	
+	public Company(ConfigHandler configHandler, JavaPlugin plugin, String name)
+	{
+		this.configHandler = configHandler;
+		this.plugin = plugin;
+		this.name = name;
+		this.owner = plugin.getServer().getPlayer(configHandler.getConfig().getString("companies." + name + ".owner"));
+		Utils.companyMap.put(name, this);
+		
 		
 	}
 	
@@ -231,21 +251,36 @@ public class Company{
 		keep = configHandler.getConfig().getIntegerList("companies." + name + ".keeps");
 		return keep;
 	}
-	public boolean addKeep(int materialID)
+	/**
+	 * 
+	 * @param materialID id of item/block to keep from employee
+	 * @return true on error
+	 */
+	public boolean addKeep(int materialID, double amountToPay)
 	{
 		if(keep.size() < amountAllowedToKeep())
 		{
 			keep.add(materialID);
-			return true;
-		}else{
+			configHandler.getConfig().set("companies." + name + "." + materialID, amountToPay);
 			return false;
+		}else{
+			return true;
 		}
 		
 	}
+	/**
+	 * 
+	 * @param materialID id of block/item to remove from keep list
+	 * @return true on error
+	 */
 	public boolean removeKeep(int materialID)
 	{
-		return keep.remove(materialID) != null;
+		return keep.remove(materialID) == null;
 	}
+	/**
+	 * 
+	 * @return amount of block/item types the company is allowed to keep from employees when they leave their property
+	 */
 	private int amountAllowedToKeep()
 	{
 		if(level < 5)

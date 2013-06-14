@@ -1,5 +1,7 @@
 package me.backspace119;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -7,9 +9,11 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.ChatColor;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 
 import org.bukkit.plugin.java.JavaPlugin;
@@ -309,6 +313,92 @@ public class CommandHandler implements CommandExecutor{
 				}
 			}else{
 				player.sendMessage(severeErrorColor() + noPerm());
+			}
+		}else if(args[0].equalsIgnoreCase("SetTakeChest"))
+		{
+			if(configHandler.getConfig().getString(player.getName()).equalsIgnoreCase(""))
+			{
+				player.sendMessage(severeErrorColor() + noPerm());
+			}else{
+			Block chest = Utils.getTargetedContainerBlock(player);
+			if(Utils.saveTakeChestToCompany(configHandler.getConfig().getString(player.getName()), chest, configHandler))
+			{
+				player.sendMessage(noErrorColor() + "You have successfully set this chest to a company take chest");
+			}else{
+				player.sendMessage(severeErrorColor() + "A CRITICAL ERROR HAS OCURRED PLEASE ENSURE YOU ARE LOOKING AT A CHEST. IF THE PROBLEM PERSISTS ASK A SYSTEM ADMINISTRATOR TO CHECK THE LOGS");
+			}
+			}
+		}else if(args[0].equalsIgnoreCase("ChangePlayerCompany"))
+		{
+			if(!perms.has(player, "corporatecraft.admin.changeCompany") || !perms.has(player, "corporatecraft.override.changCompany"))
+			{
+				player.sendMessage(severeErrorColor() + noPerm());
+			}else{
+				if(args.length < 3)
+				{
+					configHandler.getConfig().set(player.getName(), args[2]);
+					player.sendMessage(noErrorColor() + "You successfully changed your own company assignment to " + args[2]);
+					
+				}else{
+					configHandler.getConfig().set(plugin.getServer().getPlayer(args[2]).getName(), args[3]);
+				}
+			}
+		}else if(args[0].equalsIgnoreCase("getProduct"))
+		{
+			if(configHandler.getConfig().getString(player.getName()).equalsIgnoreCase(""))
+			{
+				player.sendMessage(severeErrorColor() + noPerm());
+			}else{
+				try {
+					BufferedInventoryHandler.givePlayerBufferedInv(player, configHandler.getConfig().getString(player.getName()));
+				} catch (IOException
+						| InvalidConfigurationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					player.sendMessage(severeErrorColor() + "DID NOT LOAD BUFFERED INVENTORY CORRECTLY THE FILE MIGHT NOT EXIST");
+					return false;
+				}
+				player.sendMessage(noErrorColor() + "You have successfully withdrawn items from your companies buffered inventory");
+				
+			}
+			
+		}else if(args[0].equalsIgnoreCase("addKeep"))
+		{
+			if(configHandler.getConfig().getString(player.getName()).equalsIgnoreCase(""))
+			{
+				player.sendMessage(severeErrorColor() + noPerm());
+			}else{
+				if(args.length < 3)
+				{
+					player.sendMessage(syntaxErrorColor() + "Not enough arguements /cc addKeep <item id number> <amount_to_pay_for_1_item>");
+				}else{
+				if(Utils.getCompany(configHandler.getConfig().getString(player.getName())).addKeep(Integer.parseInt(args[2]), Double.parseDouble(args[3])))
+				{
+					player.sendMessage(severeErrorColor() + "you have reached the maximum number of item types your company can keep from employees at the moment please use /cc removeKeep to give you more space");
+					
+				}else{
+					player.sendMessage(noErrorColor() + "you successfully added an item for your company to keep from employees upon leaving property");
+				}
+				}
+			}
+		}else if(args[0].equalsIgnoreCase("removeKeep"))
+		{
+			if(configHandler.getConfig().getString(player.getName()).equalsIgnoreCase(""))
+			{
+				player.sendMessage(severeErrorColor() + noPerm());
+			}else{
+				if(args.length < 2)
+				{
+					player.sendMessage(syntaxErrorColor() + "Not enough arguements /cc removeKeep <item id number>");
+				}else{
+				if(Utils.getCompany(configHandler.getConfig().getString(player.getName())).removeKeep(Integer.parseInt(args[2])))
+				{
+					player.sendMessage(severeErrorColor() + "your company does not keep this item");
+					
+				}else{
+					player.sendMessage(noErrorColor() + "you successfully added an item for your company to keep from employees upon leaving property");
+				}
+				}
 			}
 		}
 			
